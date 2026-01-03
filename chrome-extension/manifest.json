@@ -1,0 +1,40 @@
+{
+  "name": "TargetIQ Lead Capture",
+  "manifest_version": 3,
+  "description": "Capture leads instantly from any website",
+  "version": "1.0.0",
+  "host_permissions": [
+    "https://*.linkedin.com/*",
+    "https://web.whatsapp.com/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "sidebar-content-mount.js",
+        "assets/*",
+        "alfanar-logo.png"
+      ],
+      "matches": [
+        "https://*.linkedin.com/*",
+        "https://web.whatsapp.com/*"
+      ]
+    }
+  ],
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.linkedin.com/*",
+        "https://web.whatsapp.com/*"
+      ],
+      "js": ["main.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+stages:
+  - test
+
+variables:
+  POSTGRES_DB: alfanar_test
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/alfanar_test"
+  NODE_ENV: test
+
+cache:
+  paths:
+    - .pnpm-store
+
+e2e_backend:
+  stage: test
+  image: node:18
+  services:
+    - name: postgres:13
+      alias: postgres
+  script:
+    - corepack enable
+    - pnpm install --frozen-lockfile
+    - pnpm test:e2e
+  artifacts:
+    when: always
+    reports:
+      junit: test-results.xml
+  only:
+    - branches
+    - merge_requests

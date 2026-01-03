@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Playwright extension tests",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"test"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run Playwright e2e tests",
+			"type": "shell",
+			"command": "pnpm exec playwright test",
+			"problemMatcher": [],
+			"group": "test"
+		}
+	]
+}
