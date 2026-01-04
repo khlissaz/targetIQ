@@ -1,0 +1,20 @@
+{
+  "builds": [
+    {
+      "src": "backend/src/main.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["src/**/*", "node_modules/**/*"]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "backend/dist/main.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
