@@ -5,7 +5,7 @@ import { Scraping } from '../src/scraping/scraping.entity';
 
 async function main() {
   await AppDataSource.initialize();
-  const base = process.env.BACKEND_URL ?? 'http://localhost:5000';
+  const base = process.env.API_URL ?? 'http://localhost:5000';
   const idempotency = 'itest-' + Math.random().toString(36).slice(2, 9);
 
   const payload = {

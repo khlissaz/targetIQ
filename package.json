@@ -8,5 +8,8 @@
     "dev": "pnpm -r run dev",
     "build": "pnpm -r run build",
     "start": "pnpm -r run start"
+  },
+  "dependencies": {
+    "tsconfig-paths": "^4.2.0"
   }
 }
