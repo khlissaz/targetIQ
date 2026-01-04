@@ -1,7 +1,7 @@
 // api.ts
 // Helper for making API requests to the NestJS backend
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://target-iq-backend.vercel.app/api';
 
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
