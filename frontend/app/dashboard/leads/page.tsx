@@ -372,7 +372,7 @@ export default function LeadsPage() {
                               : 'bg-gray-100 text-gray-800'
                           }`}
                         >
-                          {t(lead.status)}
+                          {t(lead.status as keyof typeof t)}
                         </span>
                       </div>
                     </div>

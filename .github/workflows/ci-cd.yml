@@ -1,0 +1,66 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        folder: [backend, frontend, chrome-extension]
+    defaults:
+      run:
+        working-directory: ${{ matrix.folder }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests
+        run: |
+          if [ -f package.json ] && pnpm test --help > /dev/null 2>&1; then pnpm test; else echo "No test script"; fi
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Add your deployment steps here. Example for a generic deployment:
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v3
+
+        - name: Login to DockerHub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+        - name: Build and push Docker images
+          run: |
+            docker-compose build
+            docker tag targetiq_backend ${{ secrets.DOCKERHUB_USERNAME }}/targetiq-backend:latest
+            docker tag targetiq_frontend ${{ secrets.DOCKERHUB_USERNAME }}/targetiq-frontend:latest
+            docker tag targetiq_chrome-extension ${{ secrets.DOCKERHUB_USERNAME }}/targetiq-chrome-extension:latest
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/targetiq-backend:latest
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/targetiq-frontend:latest
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/targetiq-chrome-extension:latest
+          env:
+            DOCKER_CLI_EXPERIMENTAL: enabled
