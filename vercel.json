@@ -1,7 +1,0 @@
-{
-  "buildCommand": "pnpm --filter backend... install && pnpm --filter backend... build",
-  "startCommand": "cd backend && node -r tsconfig-paths/register dist/main.js",
-  "env": {
-    "NODE_ENV": "production"
-  }
-}
