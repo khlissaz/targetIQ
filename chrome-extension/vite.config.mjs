@@ -15,23 +15,28 @@ export default defineConfig({
         { src: './background.js', dest: '.' },
         { src: './popup.html', dest: '.' },
         { src: './popup.js', dest: '.' },
+        { src: './src/globals.css', dest: '.' },
       ],
     }),
   ],
   build: {
     outDir: 'dist',
+    emptyOutDir: false,
     rollupOptions: {
       input: {
    
-        'main': resolve(__dirname, 'src/content/main.tsx'), // General content script for content injection
+        'main': resolve(__dirname, 'src/main.tsx'), // General content script for content injection
       },
       output: {
+        format: 'iife',
+        sourcemap: true,
         entryFileNames: (chunk) => {
           if (chunk.name === 'background') return 'background/index.js';
           if (chunk.name === 'content/whatsapp') return 'content/whatsapp.js';
           if (chunk.name === 'content/linkedin') return 'content/linkedin.js';
           if (chunk.name === 'sidebar-content-mount') return 'sidebar-content-mount.js';
           if (chunk.name === 'popup/index') return 'popup/index.js';
+          if (chunk.name === 'main') return 'main.js';
           return '[name].js';
         },
         assetFileNames: (assetInfo) => {
@@ -42,7 +47,6 @@ export default defineConfig({
         },
       },
     },
-    emptyOutDir: true,
   },
   resolve: { dedupe: ['react', 'react-dom'] },
 });

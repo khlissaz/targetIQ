@@ -5,6 +5,12 @@
 			"label": "Run Next.js dev server",
 			"type": "shell",
 			"command": "pnpm run dev"
+		},
+		{
+			"label": "Run Jest tests",
+			"type": "shell",
+			"command": "pnpm test",
+			"group": "test"
 		}
 	]
 }

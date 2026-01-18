@@ -1,0 +1,154 @@
+/* ===========================
+   Tailwind Imports
+=========================== */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* ===========================
+   TargetIQ Theme Palette
+=========================== */
+:root {
+  --targetiq-primary: #FF6B00; /* Primary Orange */
+  --targetiq-navy: #1A2B3C;    /* Intelligence Navy */
+  --targetiq-grey: #F4F6F8;    /* Light Grey */
+  --targetiq-lightgrey: #F4F5F7; /* Extra Light Grey */
+  --targetiq-bg: #F4F6F8;
+  --targetiq-card: #fff;
+  --targetiq-text: #1A2B3C;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --targetiq-primary: #FF6B00;
+    --targetiq-navy: #fff;
+    --targetiq-grey: #222;
+    --targetiq-lightgrey: #333;
+    --targetiq-bg: #181A1B;
+    --targetiq-card: #23272F;
+    --targetiq-text: #fff;
+  }
+}
+
+/* ===========================
+   Tailwind Custom Utilities
+=========================== */
+@layer utilities {
+  .bg-targetiq-primary { background-color: var(--targetiq-primary); }
+  .text-targetiq-primary { color: var(--targetiq-primary); }
+  .bg-targetiq-navy { background-color: var(--targetiq-navy); }
+  .text-targetiq-navy { color: var(--targetiq-navy); }
+  .bg-targetiq-grey { background-color: var(--targetiq-grey); }
+  .text-targetiq-grey { color: var(--targetiq-grey); }
+  .bg-targetiq-card { background-color: var(--targetiq-card); }
+  .text-targetiq-text { color: var(--targetiq-text); }
+  .gradient-targetiq {
+    background-image: linear-gradient(135deg, var(--targetiq-primary), var(--targetiq-navy));
+  }
+}
+
+/* ===========================
+   General Body
+=========================== */
+body {
+  @apply text-targetiq-text bg-[var(--targetiq-bg)] antialiased;
+}
+
+/* ===========================
+   Card & Layout
+=========================== */
+.targetiq-card {
+  background: var(--targetiq-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.targetiq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  background: var(--targetiq-card);
+  border-bottom: 1.5px solid var(--targetiq-grey);
+  border-radius: 16px 16px 0 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* ===========================
+   Typography & Labels
+=========================== */
+.targetiq-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--targetiq-text);
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* ===========================
+   Inputs
+=========================== */
+.targetiq-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--targetiq-primary);
+  background: var(--targetiq-grey);
+  color: var(--targetiq-text);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 16px;
+  box-shadow: 0 1px 4px rgba(26,43,60,0.04);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.targetiq-input:focus {
+  border-color: var(--targetiq-primary);
+  box-shadow: 0 0 0 2px #FF6B0022;
+}
+
+/* ===========================
+   Buttons
+=========================== */
+.targetiq-btn {
+  padding: 0.625rem 1.25rem;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #fff;
+  background: var(--targetiq-primary);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  letter-spacing: 0.5px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(255,107,0,0.08);
+  transition: background 0.2s;
+}
+.targetiq-btn:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+.targetiq-btn:hover:not(:disabled) {
+  background: #e65c00;
+}
+
+/* ===========================
+   Error/Alert
+=========================== */
+.targetiq-error {
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.95rem;
+  background: #fff0f0;
+  border-radius: 8px;
+  padding: 0.5rem;
+  border: 1.5px solid #c00;
+  color: #c00;
+  margin-bottom: 0.5rem;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+@media (max-width: 600px) {
+  .targetiq-card { padding: 1rem; }
+}

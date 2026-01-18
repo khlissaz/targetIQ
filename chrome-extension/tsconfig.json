@@ -11,8 +11,16 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@components/*": ["components/*"],
+      "@popup/*": ["popup/*"],
+      "@contexts/*": ["contexts/*"],
+      "@locales/*": ["locales/*"]
+    }
   },
-  "include": ["src"],
+  "include": ["src", "vite-env.d.ts", "vite.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

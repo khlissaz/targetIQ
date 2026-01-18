@@ -5,14 +5,12 @@
   "version": "1.0.0",
   "host_permissions": [
     "https://*.linkedin.com/*",
-    "https://web.whatsapp.com/*"
+    "https://web.whatsapp.com/*",
+    "https://targetiq-api.vercel.app/*"
   ],
   "web_accessible_resources": [
     {
       "resources": [
-        "sidebar-content-mount.js",
-        "assets/*",
-        "alfanar-logo.png"
       ],
       "matches": [
         "https://*.linkedin.com/*",
@@ -20,7 +18,12 @@
       ]
     }
   ],
-  "permissions": ["storage"],
+    "icons": {
+    },
+  "permissions": ["cookies", "activeTab", "scripting"],
+    "externally_connectable": {
+      "matches": ["https://your-server-endpoint.com/*"]
+    },
   "action": {
     "default_popup": "popup.html"
   },
@@ -33,8 +36,10 @@
         "https://*.linkedin.com/*",
         "https://web.whatsapp.com/*"
       ],
-      "js": ["main.js"],
-      "run_at": "document_idle"
+      "js": ["main.js"]
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; style-src 'self' 'unsafe-inline';"
+  }
 }

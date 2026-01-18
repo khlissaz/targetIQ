@@ -28,6 +28,7 @@ self.addEventListener('activate', () => {
   console.log('Service worker activated');
 });
 
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'saveUser') {
     chrome.storage.local.set({ user: request.user }, () => {
@@ -41,5 +42,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({ user: result.user || null });
     });
     return true;
+  }
+
+  // Relay scraped comments to all extension views (sidebar/popup)
+  if (request.action === 'scrapedComments') {
+    // Send to all extension views (popups, sidebars, etc.)
+    chrome.runtime.sendMessage({
+      action: 'scrapedComments',
+      type: request.type,
+      payload: request.payload,
+    });
   }
 });

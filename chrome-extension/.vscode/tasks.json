@@ -20,6 +20,18 @@
 			"command": "pnpm exec playwright test",
 			"problemMatcher": [],
 			"group": "test"
+		},
+		{
+			"label": "Run extension tests",
+			"type": "shell",
+			"command": "pnpm test",
+			"group": "test"
+		},
+		{
+			"label": "Run Playwright tests",
+			"type": "shell",
+			"command": "pnpm exec playwright test",
+			"group": "test"
 		}
 	]
 }
