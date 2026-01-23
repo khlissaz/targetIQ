@@ -3,6 +3,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useRef, useState } from "react";
 import ScrapeControls from "../../controls/ScrapeControls";
 import { ScraperTable } from "../../tables/ScraperTable";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 export default function ReactionTab({
   highlight,
@@ -13,24 +15,38 @@ export default function ReactionTab({
   handleSendToServer,
   handleStopScraping,
   handleRestartScraping,
+  linkedinReactions,
+  setLinkedinReactions,
 }: any) {
-  // Real-time LinkedIn reactions state
-  const [linkedinReactions, setLinkedinReactions] = useState<any[]>([]);
-
-  // Load from localStorage on mount
+  // Load from localStorage on mount if parent data is empty
   useEffect(() => {
+    if (linkedinReactions && linkedinReactions.length > 0) return;
     const saved = localStorage.getItem('linkedin_reactions');
     if (saved) setLinkedinReactions(JSON.parse(saved));
   }, []);
 
-  // Save to localStorage on change
+  // Save to localStorage on change: merge with previous if not empty
   useEffect(() => {
-    localStorage.setItem('linkedin_reactions', JSON.stringify(linkedinReactions));
+    if (!linkedinReactions || linkedinReactions.length === 0) return;
+    const previous = localStorage.getItem('linkedin_reactions');
+    let prevArr: any[] = [];
+    if (previous) {
+      try { prevArr = JSON.parse(previous); } catch {}
+    }
+    // Merge: keep unique by timestamp+name
+    const merged = [...prevArr];
+    linkedinReactions.forEach((r: any) => {
+      if (!merged.some((m: any) => m.timestamp === r.timestamp && m.name === r.name)) {
+        merged.push(r);
+      }
+    });
+    localStorage.setItem('linkedin_reactions', JSON.stringify(merged));
+    
   }, [linkedinReactions]);
 
   // Clear table handler
   const handleClearTable = () => {
-    setLinkedinReactions([]);
+    if (setLinkedinReactions) setLinkedinReactions([]);
     localStorage.removeItem('linkedin_reactions');
   };
   const scrapingInProgress = useRef(false);
@@ -43,17 +59,17 @@ export default function ReactionTab({
     function handleMessage(event: MessageEvent) {
       if (event.source !== window || !event.data?.source) return;
       if (event.data.type === "SCRAPE_PROGRESS" && event.data.payload?.type === "reactions") {
-        setLinkedinReactions(prev => [...prev, event.data.payload.data]);
+        if (setLinkedinReactions) setLinkedinReactions((prev: any[]) => [...prev, event.data.payload.data]);
         scrapingInProgress.current = true;
       }
       if (event.data.type === "SCRAPE_DONE" && event.data.payload?.type === "reactions") {
-        setLinkedinReactions(event.data.payload.data || []);
+        if (setLinkedinReactions) setLinkedinReactions(event.data.payload.data || []);
         scrapingInProgress.current = false;
       }
     }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [linkedinReactions]);
 
   // Show progress message when scraping starts
   const { t } = useLanguage();
@@ -110,28 +126,49 @@ export default function ReactionTab({
           sendLabel={sending ? t('subtab.sending') : t('subtab.sendToServer')}
         />
         <div className="flex gap-2">
-          <button
-            onClick={handleClearTable}
-            className="bg-gray-200 text-gray-700 rounded-lg px-4 py-2 font-semibold text-base border-none shadow-sm cursor-pointer"
-            type="button"
-          >
-            {t('subtab.clearTable')}
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="secondary"
+                onClick={handleClearTable}
+                className="font-semibold text-base px-4 py-2"
+                type="button"
+              >
+                {t('subtab.clearTable')}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('subtab.clearTable')}</TooltipContent>
+          </Tooltip>
           {scrapingState === 'loading' && (
-            <button disabled className="bg-targetiq-grey text-[#888] rounded-lg px-4 py-2 font-semibold text-base border-none opacity-70 flex items-center gap-2 cursor-not-allowed">
-              <span className="loader" style={{ width: 18, height: 18, border: '3px solid #FF6B00', borderTop: '3px solid #e5e7eb', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
-              {t('subtab.loading')}
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button disabled variant="ghost" className="font-semibold text-base px-4 py-2 opacity-70 flex items-center gap-2 cursor-not-allowed">
+                  <span className="loader" style={{ width: 18, height: 18, border: '3px solid #FF6B00', borderTop: '3px solid #e5e7eb', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
+                  {t('subtab.loading')}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('subtab.loading')}</TooltipContent>
+            </Tooltip>
           )}
           {scrapingState === 'scraping' && (
-            <button onClick={handleStopScraping} className="bg-targetiq-grey text-targetiq-primary rounded-lg px-5 py-2 font-bold text-base border-none shadow-sm cursor-pointer transition-colors">
-              {t('subtab.stop')}
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={handleStopScraping} variant="secondary" className="font-bold text-base px-5 py-2">
+                  {t('subtab.stop')}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('subtab.stop') + ' scraping'}</TooltipContent>
+            </Tooltip>
           )}
           {scrapingState === 'stopped' && (
-            <button onClick={handleRestartScraping} className="bg-targetiq-navy text-white rounded-lg px-5 py-2 font-bold text-base border-none shadow-sm cursor-pointer transition-colors">
-              {t('subtab.restart')}
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={handleRestartScraping} variant="default" className="font-bold text-base px-5 py-2">
+                  {t('subtab.restart')}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('subtab.restart') + ' scraping'}</TooltipContent>
+            </Tooltip>
           )}
         </div>
       </div>

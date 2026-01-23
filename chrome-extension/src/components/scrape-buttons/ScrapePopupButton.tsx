@@ -9,12 +9,10 @@ interface ScrapePopupButtonProps {
   type: "reactions" | "reposts";
   postUrl: string;
   popup: HTMLElement;
-  t?: (key: string) => string;
 }
 
-const ScrapePopupButton: React.FC<ScrapePopupButtonProps> = ({ type, postUrl, popup, t }) => {
-  const { t: tContext } = useLanguage();
-  const translate = t || tContext;
+const ScrapePopupButton: React.FC<ScrapePopupButtonProps> = ({ type, postUrl, popup }) => {
+  const { t } = useLanguage();
   const [loading, setLoading] = React.useState(false);
   const [done, setDone] = React.useState(false);
 
@@ -48,9 +46,9 @@ const ScrapePopupButton: React.FC<ScrapePopupButtonProps> = ({ type, postUrl, po
       variant={done ? "outline" : "default"}
       size="lg"
       className="w-full my-1"
-      aria-label={done ? translate('scrape.done') : loading ? translate('scrape.loading') : translate(`scrape.${type}`)}
+      aria-label={done ? t('scrape.done') : loading ? t('scrape.loading') : t(`scrape.${type}`)}
     >
-      {done ? translate('scrape.done') : loading ? translate('scrape.loading') : translate(`scrape.${type}`)}
+      {done ? t('scrape.done') : loading ? t('scrape.loading') : t(`scrape.${type}`)}
     </Button>
   );
 };

@@ -50,7 +50,7 @@ export function injectPopupScrapeButton(
 
   root.render(
     <LanguageProvider>
-      <ScrapePopupButton type={type} postUrl={postUrl} popup={popup} t={(key) => key} />
+      <ScrapePopupButton type={type} postUrl={postUrl} popup={popup} />
     </LanguageProvider>
   );
 }

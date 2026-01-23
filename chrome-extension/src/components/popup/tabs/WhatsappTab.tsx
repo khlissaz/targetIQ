@@ -5,6 +5,7 @@ import { Play, Pause, RefreshCcw, StopCircle, Upload, Send } from 'lucide-react'
 import { Label } from '../../ui/label';
 import { exportScrapedData, ScrapeOptions } from '../../../services/whatsapp/scrapeGroupMembers';
 import { sendLeadToServer } from '../../../services/apiClient';
+import ScrapeControls from '../controls/ScrapeControls';
 
 
 
@@ -20,6 +21,7 @@ export default function WhatsappTab({ t }: WhatsappTabProps) {
   const [status, setStatus] = useState<'idle'|'loading'|'running'|'paused'|'stopped'|'completed'>('idle');
   const [processedCount, setProcessedCount] = useState(0);
   const [sending, setSending] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [toast, setToast] = useState<{type: 'success'|'error', message: string}|null>(null);
 
   useEffect(() => {
@@ -130,11 +132,14 @@ export default function WhatsappTab({ t }: WhatsappTabProps) {
 
   const handleExportXlsx = () => {
     if (!data.length) return;
+    setExporting(true);
     try {
       exportScrapedData(data);
       setToast({ type: 'success', message: t('exported_xlsx') });
     } catch (e) {
       setToast({ type: 'error', message: t('export_failed') });
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -204,17 +209,25 @@ export default function WhatsappTab({ t }: WhatsappTabProps) {
             <RefreshCcw className="w-5 h-5 mr-1 inline-block text-targetiq-navy" /> {t('scrape_restart')}
           </Button>
         )}
-        <Button style={{ minWidth: 110, opacity: !data.length ? 0.5 : 1 }} onClick={handleExportXlsx} disabled={!data.length}>
+        {/* <Button style={{ minWidth: 110, opacity: !data.length ? 0.5 : 1 }} onClick={handleExportXlsx} disabled={!data.length}>
           <Upload className="w-5 h-5 mr-1 inline-block text-targetiq-primary" /> {t('export_xlsx')}
         </Button>
         <Button style={{ minWidth: 110, opacity: !data.length || sending ? 0.5 : 1, background: '#1A2B3C' }} onClick={sendToServer} disabled={!data.length || sending}>
           <Send className="w-5 h-5 mr-1 inline-block text-targetiq-navy" /> {sending ? t('data_sending') : t('data_send')}
-        </Button>
-        <Label className="ml-2 targetiq-label" style={{ fontSize: 16, display: 'flex', alignItems: 'center', gap: 4 }}>
+        </Button>  */}
+        <ScrapeControls
+          dataLength={data.length}
+          onExport={handleExportXlsx}
+          onSend={sendToServer}
+          exportLabel={exporting ? t('subtab.exporting') : t('subtab.exportXLSX')}
+          sendLabel={sending ? t('subtab.sending') : t('subtab.sendToServer')}
+        />
+
+        {/* <Label className="ml-2 targetiq-label" style={{ fontSize: 16, display: 'flex', alignItems: 'center', gap: 4 }}>
           <input type="number" placeholder={t('option_max')} value={maxItems ?? ''} onChange={(e)=>setMaxItems(e.target.value ? Number(e.target.value) : undefined)} style={{ width: 80, borderRadius: 6, border: '1px solid #e0e7ef', padding: '3px 8px', fontSize: 15 }} /> {t('option_max')}
-        </Label>
-        <span className="ml-2 targetiq-label" style={{ fontSize: 16 }}>{t('option_processed')}: <strong>{processedCount}</strong></span>
-        <span className="ml-2 targetiq-label" style={{ fontSize: 16 }}>{t('option_status')}: <strong>{t('scrape_status_' + status)}</strong></span>
+        </Label> */}
+        <span className="ml-2 targetiq-label" style={{ fontSize: 12 }}>{t('option_processed')}: <strong>{processedCount}</strong></span>
+        <span className="ml-2 targetiq-label" style={{ fontSize: 12 }}>{t('option_status')}: <strong>{t('scrape_status_' + status)}</strong></span>
       </div>
       <div className="overflow-x-auto mt-2" style={{ marginTop: 18 }}>
         {data.length === 0 ? (

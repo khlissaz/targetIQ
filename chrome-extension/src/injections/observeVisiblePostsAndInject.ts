@@ -19,11 +19,11 @@ function observeNewPosts() {
       mutation.addedNodes.forEach(node => {
         if (node instanceof HTMLElement) {
           // If a new post, inject buttons
-          if (node.matches('[data-urn], .feed-shared-update-v2')) {
+          if (node.matches('[data-urn], .feed-shared-update-v2, [role="listitem"]')) {
             injectButtonsForPost(node);
           }
           // Or if a subtree contains posts
-          node.querySelectorAll?.('[data-urn], .feed-shared-update-v2').forEach(post => {
+          node.querySelectorAll?.('[data-urn], .feed-shared-update-v2, [role="listitem"]').forEach(post => {
             injectButtonsForPost(post as HTMLElement);
           });
         }
