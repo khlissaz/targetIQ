@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TargetIQ - Lead Capture</title>
+    <link rel="stylesheet" href="assets/main-DEp9IK9f.css" />
   <style>
     * {
       margin: 0;
@@ -210,67 +211,7 @@
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="logo">
-      <span class="logo-text">
-        <span style="color: white;">Target</span><span class="logo-iq">IQ</span>
-      </span>
-      <div class="logo-lines">
-        <div class="logo-line"></div>
-        <div class="logo-line"></div>
-        <div class="logo-line"></div>
-      </div>
-    </div>
-    <div class="tagline">Lead Generation System</div>
-  </div>
-
-  <div class="container">
-    <div class="language-toggle">
-      <button class="lang-btn active" data-lang="en">English</button>
-      <button class="lang-btn" data-lang="ar">العربية</button>
-    </div>
-
-    <div id="authSection">
-      <div class="status logged-out" id="statusMessage">
-        <span data-i18n="not-logged-in">Not logged in</span>
-      </div>
-      <button class="button" id="loginButton" data-i18n="login">Login to Dashboard</button>
-    </div>
-
-    <div id="captureSection" class="hidden">
-      <div id="message" class="message hidden"></div>
-
-      <div class="form-group">
-        <label for="fullName" data-i18n="full-name">Full Name *</label>
-        <input type="text" id="fullName" required>
-        <div class="auto-fill" data-i18n="auto-fill-hint">Auto-filled from page</div>
-      </div>
-
-      <div class="form-group">
-        <label for="email" data-i18n="email">Email *</label>
-        <input type="email" id="email" required>
-      </div>
-
-      <div class="form-group">
-        <label for="phone" data-i18n="phone">Phone</label>
-        <input type="tel" id="phone">
-      </div>
-
-      <div class="form-group">
-        <label for="company" data-i18n="company">Company</label>
-        <input type="text" id="company">
-      </div>
-
-      <div class="form-group">
-        <label for="notes" data-i18n="notes">Notes</label>
-        <textarea id="notes"></textarea>
-      </div>
-
-      <button class="button" id="captureButton" data-i18n="capture-lead">Capture Lead</button>
-      <button class="button button-secondary" id="logoutButton" data-i18n="logout">Logout</button>
-    </div>
-  </div>
-
-  <script src="popup.js"></script>
+  <div id="root"></div>
+  <script type="module" src="./popup.js"></script>
 </body>
 </html>

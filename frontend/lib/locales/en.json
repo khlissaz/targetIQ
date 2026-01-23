@@ -80,5 +80,10 @@
     "lead.phone": "Phone",
     "lead.status": "Status",
     "lead.source": "Source",
-    "lead.notes": "Notes"
+    "lead.notes": "Notes",
+    "lead.leads": "Leads",
+    "lead.no_files_for_date": "No files for this date",
+    "lead.select_file": "Select a file to view leads",
+    "lead.enrich": "Enrich Lead",
+    "lead.enrich_tooltip": "Start enrichment process to get additional information about this lead"
 }

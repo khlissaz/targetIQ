@@ -1,4 +1,18 @@
 console.log('[TargetIQ] content.js loaded');
+
+// Relay window.postMessage (from injected scripts) to extension
+window.addEventListener('message', (event) => {
+  // Only accept messages from the same window
+  if (event.source !== window) return;
+  const { type, payload, source } = event.data || {};
+  if (source === 'scraper' && (type === 'SCRAPE_PROGRESS' || type === 'SCRAPE_DONE')) {
+    chrome.runtime.sendMessage({
+      action: 'scrapedComments',
+      type,
+      payload,
+    });
+  }
+});
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'extractData') {
     const extractedData = extractPageData();

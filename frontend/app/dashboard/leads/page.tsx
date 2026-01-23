@@ -25,35 +25,33 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getScrapedLeads, getScrapings } from '@/lib/api';
 import { toast } from 'sonner';
 import { Plus, Search, Pencil, Trash2, Mail, Phone, Building } from 'lucide-react';
+import { LeadI, ScrapingI } from '@/lib/types';
+import { useLeadsData } from '@/hooks/useLeadsData';
+import EnrichLeadButton from '@/components/dashboard/leads/EnrichLeadButton';
+import { ScrapingDataSelector } from '@/components/dashboard/leads/ScrapingDataSelector';
 
 export default function LeadsPage() {
   const router = useRouter();
   const { language } = useLanguage();
   const { t } = useTranslation(language);
   const { user, loading: authLoading } = useAuth();
-  type Lead = {
-    id: string;
-    user_id: string;
-    full_name: string;
-    email: string;
-    phone?: string;
-    company?: string;
-    position?: string;
-    status: string;
-    notes?: string;
-    created_at?: string;
-  };
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const [scrapings, setScrapings] = useState<ScrapingI[]>([]);
+  const [selectedFile, setSelectedFile] = useState<string | undefined>(undefined);
+  const [selectedScrape, setSelectedScrape] = useState<ScrapingI | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [leads, setLeads] = useState<LeadI[]>([]);
+  const [filteredLeads, setFilteredLeads] = useState<LeadI[]>([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [currentLead, setCurrentLead] = useState<Lead | null>(null);
+  const [currentLead, setCurrentLead] = useState<LeadI | null>(null);
 
   const [formData, setFormData] = useState({
     full_name: '',
@@ -61,17 +59,48 @@ export default function LeadsPage() {
     phone: '',
     company: '',
     position: '',
-    status: 'new' as Lead['status'],
-    notes: '',
+    status: 'new' as LeadI['status'],
+    info: '',
   });
+
 
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/auth/login');
     } else if (user) {
-      loadLeads();
+      loadScrapings();
     }
   }, [user, authLoading]);
+
+  useEffect(() => {
+    if (scrapings.length > 0) {
+      // Default to last scraping file
+      const last = scrapings[scrapings.length - 1];
+      setSelectedFile((prev) => prev ?? last.id);
+      setSelectedScrape((prev) => prev || last);
+      setLeads(last.leads || []);
+    }
+  }, [scrapings]);
+
+  useEffect(() => {
+    if (selectedFile && scrapings.length > 0) {
+      const scrape = scrapings.find((s) => s.id === selectedFile);
+      setSelectedScrape(scrape || null);
+      setLeads(scrape?.leads || []);
+    }
+  }, [selectedFile]);
+
+  const loadScrapings = async () => {
+    setLoading(true);
+    try {
+      const files = await getScrapings();
+      setScrapings(files);
+    } catch (error: any) {
+      toast.error(error.message || t('error'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     filterLeads();
@@ -79,8 +108,9 @@ export default function LeadsPage() {
 
   const loadLeads = async () => {
     try {
-      const data = await apiFetch<Lead[]>(`/leads?user_id=${user!.id}`);
-      setLeads(data || []);
+      // You can pass limit/page if needed: getScrapedLeads({ limit: 20, page: 1 })
+      const result = await getScrapedLeads({limit: 20, page: 1});
+      setLeads(result.data || []);
     } catch (error: any) {
       toast.error(error.message || t('error'));
     } finally {
@@ -94,9 +124,9 @@ export default function LeadsPage() {
     if (searchQuery) {
       filtered = filtered.filter(
         (lead) =>
-          lead.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          lead.company?.toLowerCase().includes(searchQuery.toLowerCase())
+          lead.profile.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          lead.profile?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          lead.profile.company?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -115,7 +145,7 @@ export default function LeadsPage() {
       company: '',
       position: '',
       status: 'new',
-      notes: '',
+      info: '',
     });
     setCurrentLead(null);
   };
@@ -123,7 +153,7 @@ export default function LeadsPage() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiFetch<Lead>(
+      await apiFetch<LeadI>(
         '/leads',
         {
           method: 'POST',
@@ -143,7 +173,7 @@ export default function LeadsPage() {
     e.preventDefault();
     if (!currentLead) return;
     try {
-      await apiFetch<Lead>(
+      await apiFetch<LeadI>(
         `/leads/${currentLead.id}`,
         {
           method: 'PUT',
@@ -170,16 +200,16 @@ export default function LeadsPage() {
     }
   };
 
-  const openEditDialog = (lead: Lead) => {
+  const openEditDialog = (lead: LeadI) => {
     setCurrentLead(lead);
     setFormData({
-      full_name: lead.full_name,
-      email: lead.email,
-      phone: lead.phone || '',
-      company: lead.company || '',
-      position: lead.position || '',
+      full_name: lead.profile.name,
+      email: lead.profile?.email ?? '',
+      phone: lead.profile.phone || '',
+      company: lead.profile.company || '',
+      position: lead.profile.job || '',
       status: lead.status,
-      notes: lead.notes || '',
+      info: lead.profile.info || '',
     });
     setIsEditDialogOpen(true);
   };
@@ -197,6 +227,12 @@ export default function LeadsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        <ScrapingDataSelector
+          scrapings={scrapings}
+          selectedFile={selectedFile ?? null}
+          setSelectedFile={setSelectedFile}
+          setSelectedScrape={setSelectedScrape}
+        />
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-[#1A2B3C]">{t('allLeads')}</h1>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -209,7 +245,7 @@ export default function LeadsPage() {
             <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{t('addLead')}</DialogTitle>
-                <DialogDescription>Add a new lead to your database</DialogDescription>
+                <DialogDescription>Add a new lead to your resultbase</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleAdd} className="space-y-4">
                 <div className="space-y-2">
@@ -259,7 +295,7 @@ export default function LeadsPage() {
                   <Label htmlFor="status">{t('status')}</Label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value: Lead['status']) =>
+                    onValueChange={(value: LeadI['status']) =>
                       setFormData({ ...formData, status: value })
                     }
                   >
@@ -280,8 +316,8 @@ export default function LeadsPage() {
                   <Textarea
                     id="notes"
                     rows={3}
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    value={formData.info}
+                    onChange={(e) => setFormData({ ...formData, info: e.target.value })}
                   />
                 </div>
                 <div className="flex gap-2">
@@ -336,27 +372,27 @@ export default function LeadsPage() {
                 <div key={lead.id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{lead.full_name}</h3>
+                      <h3 className="font-semibold text-lg">{lead.profile.name}</h3>
                       <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-600">
                         <div className="flex items-center gap-1">
                           <Mail className="w-4 h-4" />
-                          {lead.email}
+                          {lead.profile.email}
                         </div>
-                        {lead.phone && (
+                        {lead.profile.phone && (
                           <div className="flex items-center gap-1">
                             <Phone className="w-4 h-4" />
-                            {lead.phone}
+                            {lead.profile.phone}
                           </div>
                         )}
-                        {lead.company && (
+                        {lead.profile.company && (
                           <div className="flex items-center gap-1">
                             <Building className="w-4 h-4" />
-                            {lead.company}
+                            {lead.profile.company}
                           </div>
                         )}
                       </div>
-                      {lead.position && (
-                        <p className="text-sm text-gray-500 mt-1">{lead.position}</p>
+                      {lead.profile.job && (
+                        <p className="text-sm text-gray-500 mt-1">{lead.profile.job}</p>
                       )}
                       <div className="mt-2">
                         <span
@@ -376,7 +412,10 @@ export default function LeadsPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
+                      {lead.profile.email == null && (
+                        <EnrichLeadButton leadId={lead.id} iconOnly />
+                      )}
                       <Button
                         variant="outline"
                         size="icon"
@@ -459,7 +498,7 @@ export default function LeadsPage() {
               <Label htmlFor="edit_status">{t('status')}</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: Lead['status']) =>
+                onValueChange={(value: LeadI['status']) =>
                   setFormData({ ...formData, status: value })
                 }
               >
@@ -480,8 +519,8 @@ export default function LeadsPage() {
               <Textarea
                 id="edit_notes"
                 rows={3}
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                value={formData.info}
+                onChange={(e) => setFormData({ ...formData, info: e.target.value })}
               />
             </div>
             <div className="flex gap-2">
