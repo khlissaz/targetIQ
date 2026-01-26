@@ -180,12 +180,12 @@ export async function getScrapings(): Promise<ScrapingI[]> {
 }
 
 // Fetch leads with optional limit and page
-export async function getScrapedLeadsById({ id, limit, page }: { id: string; limit?: number; page?: number }): Promise<{ leads: LeadI[], page: number, total: number, totalPages: number }> {
+export async function getScrapedLeadsById({ id, limit, page }: { id: string; limit?: number; page?: number }): Promise<{ items: LeadI[], page: number, total: number, totalPages: number }> {
   let query = '';
   if (id) query += `?scrapingId=${id}`;
   if (limit !== undefined) query += `&limit=${limit}`;
   if (page !== undefined) query += (query ? '&' : '?') + `page=${page}`;
-  const result: { leads: LeadI[], page: number, total: number, totalPages: number } = await apiFetch(`/scraping/list-leads/${query}`);
+  const result: { items: LeadI[], page: number, total: number, totalPages: number } = await apiFetch(`/scraping/list-leads/${query}`);
   console.log('Fetched leads by id:', id);
   console.log('Fetched leads:', result);
   return result;
