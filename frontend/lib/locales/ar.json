@@ -99,5 +99,8 @@
   "lead.createdAt": "تاريخ الإنشاء",
   "selectAction": "اختر إجراء",
   "selectDateRange": "اختر نطاق التاريخ",
-  "lead.notFoundInStore": "العميل المحتمل غير موجود."
+  "lead.notFoundInStore": "العميل المحتمل غير موجود.",
+  "lead.enrichmentCredits": "رصيد الإثراء",
+  "lead.enrichmentCreditsRemaining": "رصيد الإثراء المتبقي: {{count}}",
+  "common.close": "إغلاق"
 }

@@ -27,7 +27,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
-import { Plus, Search, Pencil, Trash2, Mail, Phone, Building } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, Mail, Phone, Building, MoreHorizontal } from 'lucide-react';
 import { LeadI, ScrapingI } from '@/lib/types';
 import { useLeadsData } from '@/hooks/useLeadsData';
 import EnrichLeadButton from '@/components/dashboard/leads/EnrichLeadButton';
@@ -484,9 +484,6 @@ export default function LeadsPage() {
                   aria-label="Select all leads"
                 />
                 <span className="flex-1">{t('lead.name')}</span>
-                <span className="w-32">{t('lead.contact')}</span>
-                <span className="w-32">{t('lead.company')}</span>
-                <span className="w-32">{t('lead.status')}</span>
                 <span className="w-32">{t('lead.actions') || 'Actions'}</span>
               </div>
               <div className="divide-y px-2">
@@ -546,10 +543,23 @@ export default function LeadsPage() {
                         </span>
                       </div>
                     </div>
-                    <span className="w-32 truncate">{lead.profile.email || lead.profile.phone}</span>
-                    <span className="w-32 truncate">{lead.profile.company}</span>
-                    <span className="w-32 truncate">{t(lead.status as keyof typeof t)}</span>
-                   <div className="flex gap-2 items-center">
+                    {/* Notes/Info with Read More if long */}
+                    <span className="w-40 truncate flex items-center">
+                      {lead.profile.info && lead.profile.info.length > 30 ? (
+                        <>
+                          {lead.profile.info.slice(0, 10)}...
+                          <span className="ml-1 cursor-pointer group relative">
+                            <MoreHorizontal className="w-4 h-4 text-[#FF6B00] inline-block align-middle" />
+                            <span className="absolute left-1/2 z-10 hidden group-hover:block bg-white text-[#1A2B3C] border border-[#FFBA18] rounded shadow-lg px-3 py-2 text-sm w-64 -translate-x-1/2 top-6">
+                              {lead.profile.info}
+                            </span>
+                          </span>
+                        </>
+                      ) : (
+                        lead.profile.info || ''
+                      )}
+                    </span>
+                    <div className="flex gap-2 items-center">
                       {lead.profile.email == null && (
                         <EnrichLeadButton leadId={lead.id} iconOnly />
                       )}
@@ -575,7 +585,7 @@ export default function LeadsPage() {
             </div>
           ) : (
             <div className="text-center py-12 text-gray-500">
-              <p>No leads found. Try adjusting your filters.</p>
+              <p>{t('noLeads')}</p>
             </div>
           )}
         </div>

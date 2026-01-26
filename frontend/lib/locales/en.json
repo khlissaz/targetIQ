@@ -98,5 +98,9 @@
     "lead.actions": "Actions",
     "selectAction": "Select Action",
     "selectDateRange": "Select Date Range",
-    "lead.notFoundInStore": "Lead not found."
+    "lead.notFoundInStore": "Lead not found.",
+    "lead.enrichmentCredits": "Enrichment Credits",
+    "lead.enrichmentCreditsRemaining": "Enrichment Credits Remaining: {{count}}",
+    "common.close": "Close",
+    "noLeads": "No leads found."
 }
