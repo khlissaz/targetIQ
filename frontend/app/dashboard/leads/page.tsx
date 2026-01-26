@@ -88,7 +88,7 @@ export default function LeadsPage() {
       console.log('Loading leads for scraping ID:', selectedFile);
       const data = await getScrapedLeadsById({ id: selectedFile || '', limit: 50, page: 1 });
      console.log('loadAllScrapedLeads', data);
-      setLeads(data.items || []);
+      setLeads(data.leads || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -297,7 +297,7 @@ export default function LeadsPage() {
                 setLoading(true);
                 try {
                   const data = await getScrapedLeadsById({ id, limit: 50, page: 1 });
-                  setLeads(data.items || []);
+                  setLeads(data.leads || []);
                 } catch (err) {
                   console.error(err);
                 }
