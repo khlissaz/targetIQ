@@ -85,5 +85,17 @@
     "lead.no_files_for_date": "No files for this date",
     "lead.select_file": "Select a file to view leads",
     "lead.enrich": "Enrich Lead",
-    "lead.enrich_tooltip": "Start enrichment process to get additional information about this lead"
+    "lead.enrich_tooltip": "Start enrichment process to get additional information about this lead",
+    "lead.enrichmentCompleted": "Enrichment completed",
+    "lead.enrichmentInProgress": "Enrichment in progress...",
+    "lead.exportCSV": "Export to CSV",
+    "lead.exportExcel": "Export to Excel",
+    "lead.exported": "Exported successfully",
+    "lead.name": "Name",
+    "lead.contact": "Contact",
+    "lead.profile": "Profile",
+    "lead.createdAt": "Created At",
+    "lead.actions": "Actions",
+    "selectAction": "Select Action",
+    "selectDateRange": "Select Date Range"
 }

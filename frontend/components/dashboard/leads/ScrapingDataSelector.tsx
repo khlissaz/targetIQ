@@ -53,7 +53,7 @@ export const ScrapingDataSelector: React.FC<ScrapingDataSelectorProps> = ({
                       : 'bg-[#FFE6B0] text-[#FF6B00] border border-[#FFBA18]'
                   }`}
                 >
-                  {file.leads?.length ?? 0} {t('lead.leads')}
+                  {file.totalLeads ?? 0} {t('lead.leads')}
                 </Badge>
               </div>
             ))}

@@ -86,5 +86,17 @@
   "lead.no_leads": "لا يوجد عملاء محتملون",
   "lead.select_file": "اختر ملفًا لعرض العملاء المحتملين",
   "lead.enrich": "إثراء العميل المحتمل",
-  "lead.enrich_tooltip": "ابدأ عملية إثراء للحصول على معلومات إضافية حول هذا العميل المحتمل"
+  "lead.enrich_tooltip": "ابدأ عملية إثراء للحصول على معلومات إضافية حول هذا العميل المحتمل",
+  "lead.enrichmentCompleted": "اكتمل الإثراء",
+  "lead.enrichmentInProgress": "جاري الإثراء...",
+  "lead.exportCSV": "تصدير CSV",
+  "lead.exportExcel": "تصدير Excel",
+  "lead.exported": "تم التصدير بنجاح",
+  "lead.name": "الاسم",
+  "lead.contact": "جهة الاتصال",
+  "lead.profile": "الملف الشخصي",
+  "lead.actions": "الإجراءات",
+  "lead.createdAt": "تاريخ الإنشاء",
+  "selectAction": "اختر إجراء",
+  "selectDateRange": "اختر نطاق التاريخ"
 }

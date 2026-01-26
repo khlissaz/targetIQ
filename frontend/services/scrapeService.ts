@@ -1,14 +1,15 @@
 import axios from 'axios';
 import apiClient from './api';
 import { toast } from '@/hooks/use-toast';
-import { ScrapingI } from '@/lib/types';
+import { LeadI, ScrapingI } from '@/lib/types';
+import { apiFetch } from '@/lib/api';
 
 /**
  * Fetch all scrapings from the server
  */
 export const fetchScrapings = async (): Promise<any> => {
   try {
-    const response = await apiClient.get('/scrapings');
+    const response = await apiClient.get('/scraping/list');
     toast({ description:'Scrapings retrieved successfully'});
     return response.data;
   } catch (error) {
@@ -22,7 +23,7 @@ export const fetchScrapings = async (): Promise<any> => {
  */
 export const fetchScrapedDataByDate = async (date: Date): Promise<any> => {
   try {
-    const response = await apiClient.get('/scrapings', { params: { date: date.toISOString() } });
+    const response = await apiClient.get('/scraping', { params: { date: date.toISOString() } });
     return response.data;
   } catch (error) {
     handleApiError(error, 'fetching scrapings by date');
@@ -45,7 +46,7 @@ export const fetchFilteredScrapings = async (startDate?: Date, endDate?: Date, l
     if (leadsCount !== undefined) {
       params.leadsCount = leadsCount;
     }
-    const response = await apiClient.get('/scrapings', { params });
+    const response = await apiClient.get('/scraping', { params });
    
     return response.data; // Return API data
   } catch (error) {
@@ -60,6 +61,7 @@ interface LeadFilters {
   job?: string;
   reactionType?: string;
 }
+
 
 export const fetchLeads = async (
   selectedFile: string | null,
@@ -123,7 +125,7 @@ export const enrichLeads = async (file: string): Promise<any> => {
  */
 export const downloadCSV = async (file: string): Promise<void> => {
   try {
-    const response = await apiClient.get("/scrapings/download", {
+    const response = await apiClient.get("/scraping/download", {
       responseType: 'blob',
     });
 
@@ -153,10 +155,38 @@ const handleApiError = (error: any, action: string) => {
 
 export const fetchScrapingsByMonth = async (month: number, year: number) => {
   try {
-    const response = await apiClient.get('/scrapings/by-month', { params: { month, year } });
+    const response = await apiClient.get('/scraping/by-month', { params: { month, year } });
     return response.data;
   } catch (error) {
     console.error('Error fetching scrapings:', error);
     throw error;
   }
+}
+
+// Fetch recent scraping files for the logged-in user
+export async function getScrapings(): Promise<ScrapingI[]> {
+  // Backend endpoint: GET /scraping/recent (requires auth)
+  const result = await apiFetch<any>(`/scraping/recent`);
+  // result can be {scraping, leads} or an array; normalize to array of ScrapingI
+  if (Array.isArray(result)) return result;
+  if (result?.scraping) {
+    // If backend returns {scraping, leads}
+    return [{
+      ...result.scraping,
+      leads: result.leads || [],
+    }];
+  }
+  return [];
+}
+
+// Fetch leads with optional limit and page
+export async function getScrapedLeadsById({ id, limit, page }: { id: string; limit?: number; page?: number }): Promise<{ itms: LeadI[], page: number, total: number, totalPages: number }> {
+  let query = '';
+  if (id) query += `?scrapingId=${id}`;
+  if (limit !== undefined) query += `&limit=${limit}`;
+  if (page !== undefined) query += (query ? '&' : '?') + `page=${page}`;
+  const result: { items: LeadI[], page: number, total: number, totalPages: number } = await apiFetch(`/scraping/list-leads/${query}`);
+  console.log('Fetched leads by id:', id);
+  console.log('Fetched leads:', result);
+  return result;
 }

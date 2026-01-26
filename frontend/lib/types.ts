@@ -106,7 +106,10 @@ export interface ScrapingI {
   id?: string;
   name: string;
   type: string;
-  leads: LeadI[];
+  items: LeadI[];
+  totalLeads?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UserI {

@@ -1,7 +1,7 @@
 import { LeadI } from "@/lib/types";
-import apiClient from "./api";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
+import apiClient from "./api";
 
 export const updateLeadStatus = async (leadId: string, status: string): Promise<void> => {
   try {

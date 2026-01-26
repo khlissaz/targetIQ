@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const checkUser = async () => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access-token') : null;
     if (!token) {
       setUser(null);
       setProfile(null);
@@ -44,10 +44,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
     try {
-      const user = await apiFetch<User>('/auth/me');
+      const user = await apiFetch<User>('/users/me');
+console.log(user);
       setUser(user);
+      console.log('Loaded user:', user);
       await loadProfile(user.id);
     } catch {
+      console.log('Invalid token, signing out');
+
       setUser(null);
       setProfile(null);
     }
@@ -71,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ email, password }),
       }
     );
-    localStorage.setItem('token', res.access_token);
+    localStorage.setItem('access-token', res.access_token);
     setUser(res.user);
     await loadProfile(res.user.id);
   };
@@ -90,7 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('access-token');
     setUser(null);
     setProfile(null);
   };
