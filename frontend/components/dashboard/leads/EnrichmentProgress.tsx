@@ -28,7 +28,7 @@ const EnrichmentProgress: React.FC = () => {
     >
       {/* Container matches LeadsPage max width */}
       <div className="w-full max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="bg-gray-800 text-white p-4 border-t border-gray-600 rounded-t-lg shadow-lg">
+        <div className="bg-[#1A2B3C] text-white p-4 border-t border-gray-600 rounded-t-lg shadow-lg">
           {!isEnrichmentCompleted && tasks.length > 0 && (
             <div className={`mb-2 text-sm ${isArabic ? "text-right" : "text-left"}`}>
               {isArabic
@@ -53,10 +53,10 @@ const EnrichmentProgress: React.FC = () => {
             <Button
               size="sm"
               variant="outline"
-              className={`${isArabic ? "mr-4" : "ml-4"} text-white border-white`}
+              className={`${isArabic ? "mr-4" : "ml-4"} text-white`}
               onClick={hideEnrichmentProgress}
             >
-              {isArabic ? "إغلاق" : "Close"}
+              { t("common.close") }
             </Button>
           </div>
         </div>
