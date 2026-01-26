@@ -87,14 +87,21 @@ export default function LeadsPage() {
     try {
       console.log('Loading leads for scraping ID:', selectedFile);
       const data = await getScrapedLeadsById({ id: selectedFile || '', limit: 50, page: 1 });
-     console.log('loadAllScrapedLeads', data);
-      setLeads(data.items || []);
+      // Normalize API response
+      const leadsArray =  data.items || [];
+      console.log('Normalized leads from API:', leadsArray);
+      setLeads(leadsArray);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log('Syncing leads to store:', leads);
+    setLeadsStore(leads);
+  }, [leads]);
 
   useEffect(() => {
     if (scrapings.length > 0 && !selectedFile) {

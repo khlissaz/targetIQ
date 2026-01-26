@@ -97,5 +97,6 @@
     "lead.createdAt": "Created At",
     "lead.actions": "Actions",
     "selectAction": "Select Action",
-    "selectDateRange": "Select Date Range"
+    "selectDateRange": "Select Date Range",
+    "lead.notFoundInStore": "Lead not found."
 }

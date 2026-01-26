@@ -98,5 +98,6 @@
   "lead.actions": "الإجراءات",
   "lead.createdAt": "تاريخ الإنشاء",
   "selectAction": "اختر إجراء",
-  "selectDateRange": "اختر نطاق التاريخ"
+  "selectDateRange": "اختر نطاق التاريخ",
+  "lead.notFoundInStore": "العميل المحتمل غير موجود."
 }
