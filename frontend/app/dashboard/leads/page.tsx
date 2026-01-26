@@ -33,10 +33,13 @@ import { useLeadsData } from '@/hooks/useLeadsData';
 import EnrichLeadButton from '@/components/dashboard/leads/EnrichLeadButton';
 import { ScrapingDataSelector } from '@/components/dashboard/leads/ScrapingDataSelector';
 import { useAppStore } from '@/lib/appStore';
+import { Zap } from 'lucide-react';
 import EnrichmentProgress from '@/components/dashboard/leads/EnrichmentProgress';
 import { fetchScrapings, getScrapedLeadsById } from '@/services/scrapeService';
 
 export default function LeadsPage() {
+    // Get enrichment credits from store
+    const enrichmentCredits = useAppStore((state) => state.enrichmentCredits);
   const router = useRouter();
   const { language } = useLanguage();
   const { t } = useTranslation(language);
@@ -291,6 +294,14 @@ export default function LeadsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        {/* Enrichment credits at the top */}
+        <div className="flex items-center justify-end w-full pt-2 pb-1">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFF7E6] border-2 border-[#FFBA18] shadow text-[#1A2B3C] font-semibold text-base">
+            <Zap className="w-5 h-5 text-[#FF6B00] animate-pulse" />
+            <span>{t('lead.enrichmentCredits') || 'Enrichment Credits'}:</span>
+            <span className="text-[#FF6B00] text-lg font-bold">{enrichmentCredits}</span>
+          </div>
+        </div>
         {/* Enrichment progress bar, always visible at top of leads page */}
         <EnrichmentProgress />
         <ScrapingDataSelector
