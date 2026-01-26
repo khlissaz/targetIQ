@@ -25,7 +25,7 @@ export const ScrapingDataSelector: React.FC<ScrapingDataSelectorProps> = ({
   return (
     <Card className="mb-6 rounded-2xl shadow-lg border-2 border-[#FFBA18] bg-gradient-to-br from-[#FFF7E6] to-[#FFF3D1]">
       <CardContent className="py-4 px-4">
-        <ScrollArea className="h-[120px]">
+        <ScrollArea className="h-[170px]">
           {scrapings.length > 0 ? (
             <div className="space-y-2">
             {scrapings.map((file, index) => (
