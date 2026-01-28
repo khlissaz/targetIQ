@@ -25,8 +25,6 @@ function ContentTabs(props: any) {
 		progressMessages,
 		scrapingState,
 		serverLimit,
-		handleExportXLSX,
-		handleSendToServer,
 		handleStartScraping,
 		handleStopScraping,
 		handleRestartScraping,
@@ -46,7 +44,7 @@ function ContentTabs(props: any) {
 		// { key: 'reposts', label: t('subtab.reposts') },
 		// { key: 'followers', label: t('subtab.followers') },
 		// { key: 'connections', label: t('subtab.connections')},
-		// { key: 'searchPersons', label: t('subtab.searchPersons') },
+		{ key: 'searchPersons', label: t('subtab.searchPersons') },
 	];
 
 	// Determine default tab from URL
@@ -91,8 +89,6 @@ function ContentTabs(props: any) {
 											handleStartScraping={handleStartScraping}
 											handleStopScraping={handleStopScraping}
 											handleRestartScraping={handleRestartScraping}
-											handleExportXLSX={handleExportXLSX}
-                                            handleSendToServer={handleSendToServer}
                                             t={t}
 										/>
 									)}
@@ -107,11 +103,23 @@ function ContentTabs(props: any) {
 											handleStartScraping={handleStartScraping}
 											handleStopScraping={handleStopScraping}
 											handleRestartScraping={handleRestartScraping}
-											handleExportXLSX={handleExportXLSX}
-                                            handleSendToServer={handleSendToServer}
                                             t={t}
 										/>
 									)}
+									{linkedinSubTab === 'searchPersons' && (
+										<LinkedInTab
+											activeSubTab={linkedinSubTab}
+											highlight={highlight}
+											progressMessages={progressMessages}
+											scrapingState={scrapingState}
+											serverLimit={serverLimit}
+											handleStartScraping={handleStartScraping}
+											handleStopScraping={handleStopScraping}
+											handleRestartScraping={handleRestartScraping}
+                                            t={t}
+										/>
+									)}
+
 									{/* Add other subtab components as needed */}
 								</>
 							)}

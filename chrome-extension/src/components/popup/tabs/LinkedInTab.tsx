@@ -23,8 +23,6 @@ interface LinkedInTabProps {
   handleStartScraping?: () => void;
   handleStopScraping?: () => void;
   handleRestartScraping?: () => void;
-  handleExportXLSX?: () => void;
-  handleSendToServer?: () => void;
 }
 
 export default function LinkedInTab(props: LinkedInTabProps) {
@@ -41,9 +39,15 @@ export default function LinkedInTab(props: LinkedInTabProps) {
       exportProfilesToExcel(linkedinComments);
     } else if (type === 'reactions') {
       exportProfilesToExcel(linkedinReactions);
+    } else if (type === 'search_person') {
+      exportProfilesToExcel(searchPersons);
     }
+    
     // Add more types as needed
   };
+
+  // State for search persons (lifted up)
+  const [searchPersons, setSearchPersons] = useState<any[]>([]);
 
   // Shared send handler
   const handleSendToServer = async (type: string) => {
@@ -58,6 +62,11 @@ export default function LinkedInTab(props: LinkedInTabProps) {
         sourceType: 'reaction',
         data: linkedinReactions,
       });
+    } else if (type === 'search_person') {
+      await sendScrapeLinkedInData({
+        sourceType: 'search_person',
+        data: searchPersons,
+      });
     }
     // Add more types as needed
   };
@@ -65,6 +74,10 @@ export default function LinkedInTab(props: LinkedInTabProps) {
   // Handler to activate Comments subtab
   const activateCommentsTab = () => {
     if (setActiveSubTab) setActiveSubTab('comments');
+  };
+  // Handler to activate Search Persons subtab
+  const activateSearchPersonsTab = () => {
+    if (setActiveSubTab) setActiveSubTab('searchPersons');
   };
 
   switch (activeSubTab) {
@@ -114,8 +127,27 @@ export default function LinkedInTab(props: LinkedInTabProps) {
     //   return <Card><FollowerTab t={t} serverLimit={serverLimit} highlight={highlight} progressMessages={progressMessages} scrapingState={scrapingState} handleStartScraping={handleStartScraping} handleStopScraping={handleStopScraping} handleRestartScraping={handleRestartScraping} /></Card>;
     // case 'connections':
     //   return <Card><ConnectionTab t={t} serverLimit={serverLimit} highlight={highlight} progressMessages={progressMessages} scrapingState={scrapingState} handleStartScraping={handleStartScraping} handleStopScraping={handleStopScraping} handleRestartScraping={handleRestartScraping} /></Card>;
-    // case 'searchPersons':
-    //   return <Card><SearchPersonsTab t={t} serverLimit={serverLimit} highlight={highlight} progressMessages={progressMessages} scrapingState={scrapingState} handleStartScraping={handleStartScraping} handleStopScraping={handleStopScraping} handleRestartScraping={handleRestartScraping} /></Card>;
+    case 'searchPersons':
+      return (
+        <Card>
+          <SearchPersonsTab
+            {...props}
+            t={t}
+            searchPersons={searchPersons}
+            setSearchPersons={setSearchPersons}
+            serverLimit={serverLimit}
+            highlight={highlight}
+            progressMessages={progressMessages}
+            scrapingState={scrapingState}
+            handleStartScraping={handleStartScraping}
+            handleStopScraping={handleStopScraping}
+            handleRestartScraping={handleRestartScraping}
+            handleExportXLSX={() => handleExportXLSX('search_person')}
+            handleSendToServer={() => handleSendToServer('search_person')}
+            activateSearchPersonsTab={activateSearchPersonsTab}
+          />
+        </Card>
+      );
     default:
       return (
         <Card>

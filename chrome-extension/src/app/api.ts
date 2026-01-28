@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { logout } from '../services/authService';
 
-export const API_BASE_URL = 'https://targetiq-api.vercel.app/api'; // Change to your API base URL
+export const API_BASE_URL = 'http://localhost:5000/api'; // Change to your API base URL
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

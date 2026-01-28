@@ -3,7 +3,7 @@ import { useLanguage } from "../../contexts/LanguageContext";
 import { Button } from "../ui/button";
 
 interface ScrapeButtonProps {
-  type: "reactions" | "reposts" | "comments";
+  type: "reactions" | "reposts" | "comments" | "search_persons";
   onClick?: () => void | Promise<any>;
   disabled?: boolean;
 }
