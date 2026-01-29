@@ -1,5 +1,5 @@
 # Important Disclaimer
-This extension is **not marketed or intended as a scraping tool**. Its purpose is to help users manage leads and contacts with full transparency and user consent. All data collection and processing is performed only after explicit opt-in, in compliance with privacy regulations. Any use of the extension must comply with the terms of service of the platforms involved and all applicable laws.
+This extension is **Data collection tool**. Its purpose is to help users manage leads and contacts with full transparency and user consent. All data collection and processing is performed only after explicit opt-in, in compliance with privacy regulations. Any use of the extension must comply with the terms of service of the platforms involved and all applicable laws.
 
 # Data Flows, User Rights, and Compliance (GDPR/CASL)
 
