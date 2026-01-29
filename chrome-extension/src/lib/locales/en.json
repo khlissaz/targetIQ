@@ -112,7 +112,7 @@
   "scrape_start": "Start Scraping",
   "scrape_pause": "Pause Scraping",
   "scrape_done": "Scraping completed successfully",
-  "scrape_error": "An error occurred during scraping",
+  "scrape_error": "An error occurred during collection",
   "scrape_stop": "Stop Scraping",
   "scrape_resume": "Resume Scraping",
   "scrape_status": "Scraping Status",
@@ -187,11 +187,11 @@
   "scraperTable.selectAll": "Select All",
   "scraperTable.deselectAll": "Deselect All",
   "scraperTable.text": "Text",
-  "scrape.comments": "Scrape Comments",
-  "scrape.reactions": "Scrape Reactions",
-  "scrape.reposts": "Scrape Reposts",
+  "scrape.comments": "Collect Comments",
+  "scrape.reactions": "Collect Reactions",
+  "scrape.reposts": "Collect Reposts",
   "scrape.loading": "Loading...",
-  "scrape.done": "Scraping done",
-  "scrape.error": "Scraping error",
-  "scrape.search_persons": "Scrape Persons"
+  "scrape.done": "Collection done",
+  "scrape.error": "Collection error",
+  "scrape.search_persons": "Collect Persons"
 }
