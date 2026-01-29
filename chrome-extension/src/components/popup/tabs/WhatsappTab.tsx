@@ -146,10 +146,9 @@ export default function WhatsappTab({ t }: WhatsappTabProps) {
   const sendToServer = async () => {
     setSending(true);
     try {
-      for (const lead of data) {
-        const payload = { source: "WHATSAPP", type: 'GROUP_MEMBERSHIP', leads: [lead] };
-        await sendLeadToServer(payload);
-      }
+      if (data.length === 0) throw new Error('No leads to send');
+      const payload = { source: "WHATSAPP", type: 'GROUP_MEMBERSHIP', leads: data };
+      await sendLeadToServer(payload);
       setToast({ type: 'success', message: t('toast_sent') });
     } catch (err) {
       setToast({ type: 'error', message: t('toast_error') });
@@ -209,12 +208,6 @@ export default function WhatsappTab({ t }: WhatsappTabProps) {
             <RefreshCcw className="w-5 h-5 mr-1 inline-block text-targetiq-navy" /> {t('scrape_restart')}
           </Button>
         )}
-        {/* <Button style={{ minWidth: 110, opacity: !data.length ? 0.5 : 1 }} onClick={handleExportXlsx} disabled={!data.length}>
-          <Upload className="w-5 h-5 mr-1 inline-block text-targetiq-primary" /> {t('export_xlsx')}
-        </Button>
-        <Button style={{ minWidth: 110, opacity: !data.length || sending ? 0.5 : 1, background: '#1A2B3C' }} onClick={sendToServer} disabled={!data.length || sending}>
-          <Send className="w-5 h-5 mr-1 inline-block text-targetiq-navy" /> {sending ? t('data_sending') : t('data_send')}
-        </Button>  */}
         <ScrapeControls
           dataLength={data.length}
           onExport={handleExportXlsx}
@@ -222,10 +215,18 @@ export default function WhatsappTab({ t }: WhatsappTabProps) {
           exportLabel={exporting ? t('subtab.exporting') : t('subtab.exportXLSX')}
           sendLabel={sending ? t('subtab.sending') : t('subtab.sendToServer')}
         />
-
-        {/* <Label className="ml-2 targetiq-label" style={{ fontSize: 16, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <input type="number" placeholder={t('option_max')} value={maxItems ?? ''} onChange={(e)=>setMaxItems(e.target.value ? Number(e.target.value) : undefined)} style={{ width: 80, borderRadius: 6, border: '1px solid #e0e7ef', padding: '3px 8px', fontSize: 15 }} /> {t('option_max')}
-        </Label> */}
+        {/* Progress spinner and status */}
+        {(status === 'loading' || status === 'running') && (
+          <span className="ml-2 flex items-center gap-2 text-targetiq-primary font-semibold text-base bg-[#fff7f0] rounded-lg px-3 py-1 shadow-sm w-fit">
+            <span className="inline-block animate-spin" style={{ width: 18, height: 18 }}>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="9" cy="9" r="7" stroke="#FF6B00" strokeWidth="3" strokeDasharray="34" strokeDashoffset="10" opacity="0.3" />
+                <path d="M16 9A7 7 0 1 1 9 2" stroke="#FF6B00" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+            </span>
+            {t('scrape_status_' + status)}
+          </span>
+        )}
         <span className="ml-2 targetiq-label" style={{ fontSize: 12 }}>{t('option_processed')}: <strong>{processedCount}</strong></span>
         <span className="ml-2 targetiq-label" style={{ fontSize: 12 }}>{t('option_status')}: <strong>{t('scrape_status_' + status)}</strong></span>
       </div>

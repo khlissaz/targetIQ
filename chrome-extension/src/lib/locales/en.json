@@ -108,6 +108,7 @@
   "subtab.exportError": "Error occurred during export",
   "subtab.sendSuccess": "Sent successfully",
   "subtab.sendError": "Error occurred during sending",
+  "subtab.scrapingProgress": "Scraping Progress",
   "scrape_start": "Start Scraping",
   "scrape_pause": "Pause Scraping",
   "scrape_done": "Scraping completed successfully",
@@ -190,5 +191,7 @@
   "scrape.reactions": "Scrape Reactions",
   "scrape.reposts": "Scrape Reposts",
   "scrape.loading": "Loading...",
-  "scrape.done": "Scraping done"
+  "scrape.done": "Scraping done",
+  "scrape.error": "Scraping error",
+  "scrape.search_persons": "Scrape Persons"
 }

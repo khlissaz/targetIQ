@@ -8,6 +8,8 @@ export default function SearchPersonsTab({ t, serverLimit, handleExportXLSX, han
   const [exporting, setExporting] = useState(false);
   const [sending, setSending] = useState(false);
   const [feedback, setFeedback] = useState("");
+  // Progress state for scraping
+  const [progress, setProgress] = useState<{ index: number; total: number }>({ index: 0, total: 0 });
 
   // Listen for real-time person data
   useEffect(() => {
@@ -16,9 +18,15 @@ export default function SearchPersonsTab({ t, serverLimit, handleExportXLSX, han
       if (event.source !== window || !event.data?.source) return;
       if (event.data.type === "SCRAPE_PROGRESS" && event.data.payload?.type === "search_persons") {
         setSearchPersons((prev: any[]) => [...prev, event.data.payload.data]);
+        // Set progress state
+        setProgress({
+          index: (event.data.payload.index ?? 0) + 1,
+          total: event.data.payload.total ?? 0
+        });
       }
       if (event.data.type === "SCRAPE_DONE" && event.data.payload?.type === "search_persons") {
         setSearchPersons(event.data.payload.data || []);
+        setProgress({ index: 0, total: 0 });
       }
     }
     window.addEventListener("message", handleMessage);
@@ -91,6 +99,18 @@ export default function SearchPersonsTab({ t, serverLimit, handleExportXLSX, han
           <button onClick={handleClearTable} className="bg-[#FF6B00] text-white px-3 py-1 rounded font-semibold text-sm">{t('subtab.clearTable') || 'Clear Table'}</button>
         </div>
       </div>
+      {/* Progress message for scraping */}
+      {progress.total > 0 && progress.index <= progress.total && (
+        <div className="mb-2 flex items-center gap-2 text-targetiq-primary font-semibold text-base bg-[#fff7f0] rounded-lg px-3 py-1 shadow-sm w-fit">
+          <span className="inline-block animate-spin" style={{ width: 18, height: 18 }}>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="9" cy="9" r="7" stroke="#FF6B00" strokeWidth="3" strokeDasharray="34" strokeDashoffset="10" opacity="0.3" />
+              <path d="M16 9A7 7 0 1 1 9 2" stroke="#FF6B00" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+          </span>
+          {t('subtab.scrapingProgress', { index: progress.index, total: progress.total }) || `Scraping ${progress.index} of ${progress.total}...`}
+        </div>
+      )}
       {/* Feedback message for export/send actions */}
       {feedback && (
         <div className={feedback.includes('error') ? 'text-[#c00]' : 'text-targetiq-navy'} style={{ fontWeight: 600, marginBottom: 8, fontSize: 15 }}>{feedback}</div>

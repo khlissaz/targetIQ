@@ -174,7 +174,15 @@ export default function ReactionTab({
       </div>
       {/* Progress message display */}
       {localProgress && (
-        <div className="text-targetiq-primary font-semibold mb-2 text-[15px]">{localProgress}</div>
+        <div className="mb-2 flex items-center gap-2 text-targetiq-primary font-semibold text-base bg-[#fff7f0] rounded-lg px-3 py-1 shadow-sm w-fit">
+          <span className="inline-block animate-spin" style={{ width: 18, height: 18 }}>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="9" cy="9" r="7" stroke="#FF6B00" strokeWidth="3" strokeDasharray="34" strokeDashoffset="10" opacity="0.3" />
+              <path d="M16 9A7 7 0 1 1 9 2" stroke="#FF6B00" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+          </span>
+          {localProgress}
+        </div>
       )}
       {/* Feedback message for export/send actions */}
       {feedback && (

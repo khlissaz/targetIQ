@@ -108,6 +108,7 @@
   "subtab.exportError": "حدث خطاء في التصدير",
   "subtab.sendSuccess": "تم الارسال بنجاح",
   "subtab.sendError": "حدث خطاء في الارسال",
+  "subtab.scrapingProgress": "تقدم الجمع",
   "scrape_start": "ابدأ الجمع",
   "scrape_pause": "توقف الجمع",
   "scrape_done": "تم الجمع بنجاح",
@@ -191,5 +192,7 @@
   "scrape.reactions": "اجمع التفاعلات",
   "scrape.reposts": "اجمع إعادة النشر",
   "scrape.loading": "جاري التحميل...",
-  "scrape.done": "تم الجمع بنجاح"
+  "scrape.done": "تم الجمع بنجاح",
+  "scrape.error": "حدث خطاء في الجمع",
+  "scrape.search_persons": "اجمع الأشخاص"
 }
