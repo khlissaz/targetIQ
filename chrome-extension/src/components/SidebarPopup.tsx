@@ -19,6 +19,9 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
   }
 }
 import React, { useEffect, useState, useRef } from 'react';
+import PrivacyTermsModal from './popup/PrivacyTermsModal';
+import ConsentModal from './popup/ConsentModal';
+import DataManagementModal from './popup/DataManagementModal';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { useAuth } from '../hooks/useAuth';
@@ -45,7 +48,24 @@ const MAX_HEIGHT = 800;
 export type SidebarPopupState = 'open' | 'minimized' | 'closed';
 
 function SidebarPopup() {
- 
+  const [showDataModal, setShowDataModal] = useState(false);
+  // Privacy/Terms acceptance state
+  const [privacyAccepted, setPrivacyAccepted] = useState(() => {
+    try {
+      return localStorage.getItem('privacyAccepted') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  // Explicit user consent state
+  const [userConsent, setUserConsent] = useState(() => {
+    try {
+      return localStorage.getItem('userConsent') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
   const [state, setState] = useState<SidebarPopupState>('minimized');
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [height, setHeight] = useState(DEFAULT_HEIGHT);
@@ -146,6 +166,23 @@ function SidebarPopup() {
   // Close sidebar
   const handleClose = () => setState('closed');
 
+
+
+  // Show privacy/terms modal if not accepted
+  if (!privacyAccepted) {
+    return <PrivacyTermsModal onAccept={() => {
+      setPrivacyAccepted(true);
+      try { localStorage.setItem('privacyAccepted', 'true'); } catch {}
+    }} />;
+  }
+  // Show explicit consent modal if not given
+  if (!userConsent) {
+    return <ConsentModal onAccept={() => {
+      setUserConsent(true);
+      try { localStorage.setItem('userConsent', 'true'); } catch {}
+    }} />;
+  }
+
   // If minimized, clicking the bar restores
   if (state === 'minimized') {
     return (
@@ -239,12 +276,21 @@ function SidebarPopup() {
      
       {/* End Enhanced Logo Header */}
       {/* Optionally, keep the rest of the header controls below the logo if needed */}
-      <Header
-        authed={isAuthenticated}
-        user={isAuthenticated ? user : null}
-        doLogout={isAuthenticated ? logout : () => {}}
-        
-      />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Header
+          authed={isAuthenticated}
+          user={isAuthenticated ? user : null}
+          doLogout={isAuthenticated ? logout : () => {}}
+        />
+        <button
+          onClick={() => setShowDataModal(true)}
+          style={{ marginLeft: 8, padding: '4px 12px', borderRadius: 8, background: '#eee', color: '#1A2B3C', fontWeight: 600, fontSize: 14, border: '1px solid #ddd', cursor: 'pointer' }}
+          title="Export or Delete My Data"
+        >
+          Manage My Data
+        </button>
+      </div>
+      {showDataModal && <DataManagementModal onClose={() => setShowDataModal(false)} />}
       <div className="pt-0 pb-2 px-0 h-[calc(100%-64px)] overflow-hidden rounded-br-2xl">
         {isAuthenticated ? (
           <ContentTabs

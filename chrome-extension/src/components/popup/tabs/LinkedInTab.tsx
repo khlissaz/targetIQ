@@ -35,6 +35,10 @@ export default function LinkedInTab(props: LinkedInTabProps) {
 
   // Shared export handler
   const handleExportXLSX = async (type: string) => {
+    if (localStorage.getItem('userConsent') !== 'true') {
+      alert('Consent required before exporting data.');
+      return;
+    }
     if (type === 'comments') {
       exportProfilesToExcel(linkedinComments);
     } else if (type === 'reactions') {
@@ -42,7 +46,6 @@ export default function LinkedInTab(props: LinkedInTabProps) {
     } else if (type === 'search_person') {
       exportProfilesToExcel(searchPersons);
     }
-    
     // Add more types as needed
   };
 
@@ -51,7 +54,10 @@ export default function LinkedInTab(props: LinkedInTabProps) {
 
   // Shared send handler
   const handleSendToServer = async (type: string) => {
-    console.log("LinkedInTab props:", props);
+    if (localStorage.getItem('userConsent') !== 'true') {
+      alert('Consent required before sending data.');
+      return;
+    }
     if (type === 'comments') {
       await sendScrapeLinkedInData({
         sourceType: 'comment',

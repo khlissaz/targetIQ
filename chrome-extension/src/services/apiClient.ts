@@ -17,7 +17,16 @@ interface ScrapeDataPayload {
   data: ScrapedLeadDto[];
 }
 
-const API_BASE_URL = 'http://localhost:5000/api'; // change to your backend URL
+// Enforce HTTPS for API calls
+let API_BASE_URL = 'https://localhost:5000/api'; // default to HTTPS
+if (typeof window !== 'undefined') {
+  const stored = localStorage.getItem('apiBaseUrl');
+  if (stored) API_BASE_URL = stored;
+}
+if (!API_BASE_URL.startsWith('https://')) {
+  // Warn and block if not secure
+  throw new Error('API_BASE_URL must use HTTPS for secure data transmission. Please update your backend URL.');
+}
 
 interface SendScrapeOptions {
   token?: string;
