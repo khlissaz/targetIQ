@@ -560,7 +560,7 @@ export default function LeadsPage() {
                       )}
                     </span>
                     <div className="flex gap-2 items-center">
-                      {lead.profile.email == null && (
+                      {!lead.profile.email && (
                         <EnrichLeadButton leadId={lead.id} iconOnly />
                       )}
                       <Button

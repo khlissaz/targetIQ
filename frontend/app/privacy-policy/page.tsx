@@ -64,7 +64,7 @@ const PrivacyPolicy = () => {
         </a>
       </p>
 
-      <p className="text-sm text-gray-500 mt-8">Last updated: May 30, 2025</p>
+      <p className="text-sm text-gray-500 mt-8">Last updated: February, 2026</p>
     </div>
   );
 };
