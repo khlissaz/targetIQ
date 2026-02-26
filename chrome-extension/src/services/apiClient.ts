@@ -18,7 +18,7 @@ interface ScrapeDataPayload {
 }
 
 // Enforce HTTPS for API calls
-let API_BASE_URL = 'https://localhost:5000/api'; // default to HTTPS
+let API_BASE_URL = 'https://targetiq-api.vercel.app/api'; // default to HTTPS
 if (typeof window !== 'undefined') {
   const stored = localStorage.getItem('apiBaseUrl');
   if (stored) API_BASE_URL = stored;
