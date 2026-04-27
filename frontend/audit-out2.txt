@@ -1,0 +1,20 @@
+﻿Found 32 missing locale key references:
+
+== app/landing/page.tsx ==
+  [EN MISS][AR MISS] pricing.contactUs => "Contact us"
+  [EN MISS][AR MISS] pricing.yearly_savings => "Save vs monthly"
+  [AR MISS] landing.pricing.capturesLabel => "Lead captures / month"
+  [AR MISS] landing.pricing.enrichLabel => "Enrich credits / month"
+  [AR MISS] landing.pricing.teamLabel => "Team members"
+  [AR MISS] landing.pricing.teamNone => "Solo"
+  [AR MISS] landing.pricing.teamUnlimited => "Unlimited"
+  [AR MISS] landing.pricingFaqTitle => "Pricing FAQ"
+  [AR MISS] landing.pricingFaq.captureQ => "What is Lead Capture?"
+  [AR MISS] landing.pricingFaq.captureA => "Lead Capture is saving profiles and lists from LinkedIn or WhatsApp into your TargetIQ workspace so you can manage and export them later."
+  [AR MISS] landing.pricingFaq.enrichQ => "How do enrichment credits work?"
+  [AR MISS] landing.pricingFaq.enrichA => "Enrichment credits are only used when we successfully find contact details. Each found email or phone number consumes enrich credits based on the rules above."
+  [AR MISS] landing.pricingFaq.addonQ => "Can I buy extra enrich credits?"
+  [AR MISS] landing.pricingFaq.addonA => "Yes. You can purchase add-on enrich credit packs from inside the app at any time without changing your base plan."
+  [AR MISS] landing.pricingFaq.rolloverQ => "Do unused credits roll over?"
+  [AR MISS] landing.pricingFaq.rolloverA => "Plan-based capture and enrich quotas reset each billing period and do not roll over. Purchased add-on enrich credits stay in your balance until you use them."
+

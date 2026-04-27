@@ -1,0 +1,13 @@
+/.next
+node_modules
+.env
+.env.local
+dist
+.DS_Store
+.idea
+.vscode
+coverage
+build
+npm-debug.log
+yarn-error.log
+pnpm-lock.yaml

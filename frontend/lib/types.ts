@@ -9,7 +9,6 @@ export interface Reaction {
   postLink: string;
 }
 export interface LinkedInProfileData {
-  // Basic Info
   name: string;
   firstname: string;
   lastname: string;
@@ -17,14 +16,10 @@ export interface LinkedInProfileData {
   location: string;
   about: string;
   profilePicture: string;
-  
-  // Contact
   email: string;
   phone: string;
   website: string;
   profileLink: string;
-  
-  // Experience
   experiences: {
     title: string;
     company: string;
@@ -32,34 +27,24 @@ export interface LinkedInProfileData {
     description: string;
     location: string;
   }[];
-  
-  // Education
   education: {
     institution: string;
     degree: string;
     field: string;
     duration: string;
   }[];
-  
-  // Skills
   skills: string[];
-  
-  // Certifications (including PDF links)
   certifications: {
     name: string;
     issuer: string;
     date: string;
     pdfUrl?: string;
   }[];
-  
-  // Projects
   projects: {
     title: string;
     description: string;
     url?: string;
   }[];
-  
-  // Additional PDFs (resumes, portfolios)
   documents: {
     name: string;
     type: 'resume' | 'portfolio' | 'other';
@@ -73,7 +58,7 @@ export interface LeadI {
   id: string;
   status?: string;
   title?: string;
-  profile :{
+  profile: {
     name: string;
     firstname?: string;
     lastname?: string;
@@ -82,15 +67,15 @@ export interface LeadI {
     company?: string;
     job?: string;
     email?: string | null;
-  phone?: string;
-  info?: string;
-  location?: string;
-  caption?: string;
-  website?: string;
-  websites?: string[];
-  twitter?: string;
-  ims?: string[];
-  about?: string;
+    phone?: string;
+    info?: string;
+    location?: string;
+    caption?: string;
+    website?: string;
+    websites?: string[];
+    twitter?: string;
+    ims?: string[];
+    about?: string;
   };
   text?: string;
   seeMore?: boolean;
@@ -111,6 +96,9 @@ export interface ScrapingI {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export type CollectionI = ScrapingI;
+export type CollectedLeadDto = ScrapedLeadDto;
 
 export interface UserI {
   id: string;
@@ -135,7 +123,10 @@ export interface GetEnrichmentTasksStatusI {
   leadId: string;
   status: 'pending' | 'success' | 'failed' | 'error';
   email?: string;
+  phone?: string;
   name?: string;
+  requestedFields?: Array<'email' | 'phone'>;
+  message?: string;
 }
 export interface StartLeadEnrichmentI {
   taskId: string | null;
@@ -143,13 +134,20 @@ export interface StartLeadEnrichmentI {
   step: 'step0' | 'step1' | 'step2';
   source: 'DataBase' | 'FullEnrich' | null;
   email: string | null;
+  phone?: string | null;
+  requestedFields?: Array<'email' | 'phone'>;
+  cacheHit?: boolean;
   message: string;
   enrichmentRequestId: string | null;
+  creditsUsed?: number | null;
 }
 export interface EnrichmentTaskI {
   leadId: string;
   status: 'new' | 'contacted' | 'qualified' | 'enriched' | 'converted' | 'pending' | 'success' | 'error' | 'failed' | 'terminated';
   message?: string;
   email?: string;
+  phone?: string;
   name: string;
+  requestedFields?: Array<'email' | 'phone'>;
+  creditsUsed?: number | null;
 }

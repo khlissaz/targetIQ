@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { Language } from '@/lib/i18n';
 
 interface LanguageContextType {
@@ -10,15 +10,32 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('en');
+function getInitialLanguage(): Language {
+  // Always default to 'en' for the initial render so
+  // server-rendered HTML matches the first client render.
+  return 'en';
+}
 
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguageState] = useState<Language>(() => getInitialLanguage());
+
+  // After mount, hydrate language from localStorage (if present).
   useEffect(() => {
-    const savedLang = localStorage.getItem('language') as Language;
-    if (savedLang && (savedLang === 'en' || savedLang === 'ar')) {
-      setLanguageState(savedLang);
+    try {
+      if (typeof window === 'undefined') return;
+      const saved = localStorage.getItem('language');
+      if (saved === 'ar' || saved === 'en') {
+        setLanguageState((prev) => (prev !== saved ? saved : prev));
+      }
+    } catch {
+      // ignore
     }
   }, []);
+
+  useLayoutEffect(() => {
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = language;
+  }, [language]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);

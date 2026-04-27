@@ -1,5 +1,7 @@
 import type { Config } from 'tailwindcss';
 
+const tiq = (cssVar: string) => `rgb(var(${cssVar}) / <alpha-value>)`;
+
 const config: Config = {
   darkMode: ['class'],
   content: [
@@ -9,6 +11,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        // Use CSS font variables so LTR/RTL selection works consistently
+        sans: ['var(--font-inter)', 'Inter', 'Noto Sans Arabic', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
@@ -18,8 +24,28 @@ const config: Config = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        tiq: 'var(--tiq-radius)',
+        tiqLg: 'calc(var(--tiq-radius) + 2px)',
+      },
+      boxShadow: {
+        tiq: 'var(--tiq-shadow)',
+        tiqLg: 'var(--tiq-shadow)',
       },
       colors: {
+        tiq: {
+          primary: tiq('--tiq-primary-rgb'),
+          secondary: tiq('--tiq-secondary-rgb'),
+          navy: tiq('--tiq-secondary-rgb'),
+          bg: tiq('--tiq-bg-rgb'),
+          surface: tiq('--tiq-surface-rgb'),
+          border: tiq('--tiq-border-rgb'),
+          text: tiq('--tiq-text-rgb'),
+          muted: tiq('--tiq-muted-rgb'),
+          success: tiq('--tiq-success-rgb'),
+          warning: tiq('--tiq-warning-rgb'),
+          danger: tiq('--tiq-danger-rgb'),
+          info: tiq('--tiq-info-rgb'),
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

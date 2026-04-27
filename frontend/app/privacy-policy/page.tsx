@@ -6,7 +6,7 @@ const PrivacyPolicy = () => {
       <h1 className="text-2xl font-bold mb-4">Privacy Policy</h1>
 
       <p className="mb-4">
-        This privacy policy outlines how the LinkedIn Scraper Chrome Extension (“the Extension”) collects, uses, and protects your information.
+        This privacy policy outlines how the LinkedIn Data Collector extension (the Extension) collects, uses, and protects your information.
       </p>
 
       <h2 className="text-xl font-semibold mt-6 mb-2">1. Information We Collect</h2>
@@ -43,7 +43,7 @@ const PrivacyPolicy = () => {
 
       <h2 className="text-xl font-semibold mt-6 mb-2">5. Permissions</h2>
       <p className="mb-4">
-        The Extension uses Chrome permissions such as <code>activeTab</code>, <code>storage</code>, <code>cookies</code>, and access to LinkedIn pages (<code>*://www.linkedin.com/*</code>) to function correctly. These permissions are strictly limited to the Extension’s core scraping and data display features.
+        The Extension uses Chrome permissions such as <code>activeTab</code>, <code>storage</code>, <code>cookies</code>, and access to LinkedIn pages (<code>*://www.linkedin.com/*</code>) to function correctly. These permissions are strictly limited to the Extension’s core data collection and data display features.
       </p>
 
       <h2 className="text-xl font-semibold mt-6 mb-2">6. User Rights</h2>
@@ -53,18 +53,18 @@ const PrivacyPolicy = () => {
 
       <h2 className="text-xl font-semibold mt-6 mb-2">7. Changes</h2>
       <p className="mb-4">
-        We may update this policy periodically. Any updates will be posted on this page with a revised "Last updated" date.
+        We may update this policy periodically. Any updates will be posted on this page with a revised Last updated date.
       </p>
 
       <h2 className="text-xl font-semibold mt-6 mb-2">8. Contact</h2>
       <p className="mb-4">
         If you have any questions or concerns, please contact us at:{" "}
-        <a href="mailto:your@email.com" className="text-blue-600">
+        <a href="mailto:your@email.com" className="text-tiq-primary hover:underline">
           your@email.com
         </a>
       </p>
 
-      <p className="text-sm text-gray-500 mt-8">Last updated: February, 2026</p>
+      <p className="text-sm text-tiq-muted mt-8">Last updated: February, 2026</p>
     </div>
   );
 };

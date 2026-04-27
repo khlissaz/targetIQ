@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { ScrapingI } from '@/lib/types';
 import { useAppStore } from '@/lib/appStore';
-import { fetchFilteredLeadsByScrapingId } from '@/services/leadServices';
-import { fetchFilteredScrapings, fetchScrapingsByMonth } from '@/services/scrapeService';
+import { fetchFilteredLeadsByCollectionId } from '@/services/leadServices';
+import { fetchFilteredCollections, fetchCollectionByMonth } from '@/services/collectionService';
+import { safeLog, sanitizeError, hashIdentifier } from '@/lib/safeLogging';
 
 export const useLeadsData = (
   selectedDateRange: Date | undefined, // Conservé pour compatibilité, mais non utilisé
   selectedFile: string | null,
-  selectedScrape: ScrapingI | null,
+  selectedCollection: ScrapingI | null,
   page: number,
   limit: number,
   currentMonth: number,
@@ -17,8 +18,8 @@ export const useLeadsData = (
 ) => {
   const setLeads = useAppStore((state) => state.setLeads);
 
-  const [scrapings, setScrapings] = useState<ScrapingI[]>([]);
-  const [monthlyScrapings, setMonthlyScrapings] = useState<{ [date: string]: ScrapingI[] }>({});
+  const [collections, setCollections] = useState<ScrapingI[]>([]);
+  const [monthlyCollections, setMonthlyCollections] = useState<{ [date: string]: ScrapingI[] }>({});
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -26,35 +27,40 @@ export const useLeadsData = (
   useEffect(() => {
     setLoading(true);
     setError('');
-    const fetchScrapingsData = async () => {
+    const fetchCollectionsData = async () => {
       try {
-        const data = await fetchFilteredScrapings(); // Appel sans paramètres de date
-        console.log('Scrapings chargés dans useLeadsData:', data); // Log temporaire
-        setScrapings(data);
+        const data = await fetchFilteredCollections(); // Appel sans paramètres de date
+        safeLog('info', 'leads.collections.loaded', {
+          itemCount: Array.isArray(data) ? data.length : undefined,
+        });
+        setCollections(data);
       } catch (error) {
-        setError('Failed to fetch scrapings: ' + error);
+        const se = sanitizeError(error);
+        setError('Failed to fetch collections: ' + se.message);
+        safeLog('error', 'leads.fetchCollections.failed', { message: se.message, code: se.code });
       } finally {
         setLoading(false);
       }
     };
-    fetchScrapingsData();
+    fetchCollectionsData();
   }, []); // Supprimé selectedDateRange des dépendances
 
   useEffect(() => {
     const fetchLeadsData = async () => {
-      if (selectedFile && selectedScrape) {
+      if (selectedFile && selectedCollection) {
         try {
-          console.log(
-            'view',
-            'leads',
-            'User viewed leads for scraping ID ' + selectedFile
-          );
+          safeLog('info', 'leads.view', {
+            action: 'view',
+            scrapingIdHash: selectedFile ? hashIdentifier(String(selectedFile), 'scrapingId') : undefined,
+          });
           const filters = {};
-          const result = await fetchFilteredLeadsByScrapingId(selectedFile, filters, page, limit);
+          const result = await fetchFilteredLeadsByCollectionId(selectedFile, filters, page, limit);
           setLeads(result.leads || []);
           setTotal(result.total);
         } catch (error) {
-          setError('Error loading leads by scraping ID: ' + error);
+          const se = sanitizeError(error);
+          setError('Error loading leads by collection ID: ' + se.message);
+          safeLog('error', 'leads.fetchLeadsByCollection.failed', { message: se.message, code: se.code });
         }
       } else {
         setLeads([]);
@@ -62,25 +68,26 @@ export const useLeadsData = (
       }
     };
     fetchLeadsData();
-  }, [selectedFile, selectedScrape, page, limit, setLeads]);
+  }, [selectedFile, selectedCollection, page, limit, setLeads]);
 
   useEffect(() => {
     const fetchMonthlyData = async () => {
       try {
-        const data = await fetchScrapingsByMonth(currentMonth, currentYear);
-        setMonthlyScrapings(data);
+        const data = await fetchCollectionByMonth(currentMonth, currentYear);
+        setMonthlyCollections(data as { [date: string]: ScrapingI[] });
       } catch (error) {
-        console.error('Error fetching monthly scrapings:', error);
+        const se = sanitizeError(error);
+        safeLog('error', 'leads.fetchMonthly.failed', { message: se.message, code: se.code });
       }
     };
     fetchMonthlyData();
   }, [currentMonth, currentYear]);
 
   return {
-    scrapings,
-    setScrapings,
-    monthlyScrapings,
-    setMonthlyScrapings,
+    collections,
+    setCollections,
+    monthlyCollections,
+    setMonthlyCollections,
     total,
     setTotal,
     loading,

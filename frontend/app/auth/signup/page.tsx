@@ -29,21 +29,22 @@ export default function SignupPage() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error(t('auth.passwordsNoMatch'));
       return;
     }
 
     if (password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+      toast.error(t('auth.passwordMinLength'));
       return;
     }
 
     setLoading(true);
 
     try {
-      await signUp(email, password, fullName);
-      toast.success('Account created successfully! Please check your email.');
-      router.push('/auth/login');
+      const businessId = await signUp(email, password, fullName);
+      void businessId; // workspace may be provisioned in onboarding
+      toast.success(t('auth.signupSuccess'));
+      router.push('/onboarding');
     } catch (error: any) {
       toast.error(error.message || t('error'));
     } finally {
@@ -52,7 +53,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col" dir={dir}>
+    <div className="min-h-screen bg-gradient-to-br from-tiq-bg to-tiq-surface flex flex-col" dir={dir}>
       <header className="p-4 flex items-center justify-between">
         <Link href="/landing">
           <Logo showTagline={false} />
@@ -63,8 +64,8 @@ export default function SignupPage() {
       <div className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-3xl font-bold text-[#1A2B3C]">{t('signup')}</CardTitle>
-            <CardDescription>Create your account to start generating leads</CardDescription>
+            <CardTitle className="text-3xl font-bold text-tiq-navy">{t('signup')}</CardTitle>
+            <CardDescription>{t('auth.signupDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,7 +74,7 @@ export default function SignupPage() {
                 <Input
                   id="fullName"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder={t('auth.fullNamePlaceholder')}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
@@ -86,7 +87,7 @@ export default function SignupPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t('auth.emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -122,16 +123,16 @@ export default function SignupPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-[#FF6B00] hover:bg-[#ff7d1a]"
+                className="w-full bg-tiq-primary hover:opacity-95 active:opacity-90"
                 disabled={loading}
               >
-                {loading ? 'Creating account...' : t('signup')}
+                {loading ? t('auth.creatingAccount') : t('signup')}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm">
-              <span className="text-gray-600">{t('alreadyHaveAccount')} </span>
-              <Link href="/auth/login" className="text-[#FF6B00] hover:underline font-semibold">
+              <span className="text-tiq-muted">{t('alreadyHaveAccount')} </span>
+              <Link href="/auth/login" className="text-tiq-primary hover:underline font-semibold">
                 {t('login')}
               </Link>
             </div>

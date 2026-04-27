@@ -1,26 +1,24 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiFetch } from '@/lib/api';
+import { ApiError, apiFetch, getAuthMe, type AuthMeDto } from '@/lib/api';
+import { safeLog } from '@/lib/safeLogging';
 
 interface User {
   id: string;
   email: string;
   [key: string]: any;
 }
-interface Profile {
-  id: string;
-  email: string;
-  full_name?: string;
-  role?: string;
-  [key: string]: any;
-}
+
 interface AuthContextType {
   user: User | null;
-  profile: Profile | null;
+  me: AuthMeDto | null;
+  activeBusinessId: string | null;
+  capabilities: string[];
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<string | null>;
+  signUp: (email: string, password: string, fullName: string) => Promise<string | null>;
+  provisionWorkspace: () => Promise<string | null>;
   signOut: () => Promise<void>;
 }
 
@@ -28,43 +26,76 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [me, setMe] = useState<AuthMeDto | null>(null);
+  const [activeBusinessId, setActiveBusinessId] = useState<string | null>(null);
+  const [capabilities, setCapabilities] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkUser();
   }, []);
 
+  const decodeJwt = (token: string): any | null => {
+    try {
+      const parts = String(token || '').split('.');
+      if (parts.length < 2) return null;
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+      const json = atob(padded);
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  };
+
+  const setStateFromMe = (me: AuthMeDto) => {
+    setMe(me);
+    setUser(me.user as any);
+    setCapabilities(Array.isArray(me.capabilities) ? me.capabilities : []);
+
+    const resolvedBusinessId = me.activeBusinessId ?? null;
+    setActiveBusinessId(resolvedBusinessId);
+    if (resolvedBusinessId) {
+      localStorage.setItem('active-business-id', resolvedBusinessId);
+    }
+  };
+
   const checkUser = async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('access-token') : null;
     if (!token) {
       setUser(null);
-      setProfile(null);
+      setMe(null);
+      setActiveBusinessId(null);
+      setCapabilities([]);
       setLoading(false);
       return;
     }
     try {
-      const user = await apiFetch<User>('/users/me');
-console.log(user);
-      setUser(user);
-      console.log('Loaded user:', user);
-      await loadProfile(user.id);
-    } catch {
-      console.log('Invalid token, signing out');
+      const me = await getAuthMe();
+      setStateFromMe(me);
+    } catch (err: any) {
+      // Allow onboarding for users who are authenticated but have no business memberships yet.
+      if (err instanceof ApiError && err.status === 403) {
+        const code = typeof err.data === 'object' && err.data && typeof (err.data as any).code === 'string' ? String((err.data as any).code) : '';
+        if (code === 'NOT_MEMBER') {
+          const payload = decodeJwt(token);
+          setUser(payload?.sub ? { id: payload.sub, email: payload.email, role: payload.role } : null);
+          setMe(null);
+          setActiveBusinessId(null);
+          setCapabilities([]);
+          setLoading(false);
+          return;
+        }
+      }
 
+      safeLog('warn', 'auth.invalidToken', { action: 'signOut' });
       setUser(null);
-      setProfile(null);
+      setMe(null);
+      setActiveBusinessId(null);
+      setCapabilities([]);
     }
     setLoading(false);
-  };
-
-  const loadProfile = async (userId: string) => {
-    try {
-      const profile = await apiFetch<Profile>(`/users/${userId}`);
-      setProfile(profile);
-    } catch {
-      setProfile(null);
-    }
   };
 
   const signIn = async (email: string, password: string) => {
@@ -76,8 +107,24 @@ console.log(user);
       }
     );
     localStorage.setItem('access-token', res.access_token);
-    setUser(res.user);
-    await loadProfile(res.user.id);
+    try {
+      const me = await getAuthMe();
+      setStateFromMe(me);
+      return me.activeBusinessId ?? null;
+    } catch (err: any) {
+      if (err instanceof ApiError && err.status === 403) {
+        const code = typeof err.data === 'object' && err.data && typeof (err.data as any).code === 'string' ? String((err.data as any).code) : '';
+        if (code === 'NOT_MEMBER') {
+          const payload = decodeJwt(res.access_token);
+          setUser(payload?.sub ? { id: payload.sub, email: payload.email, role: payload.role } : null);
+          setMe(null);
+          setActiveBusinessId(null);
+          setCapabilities([]);
+          return null;
+        }
+      }
+      throw err;
+    }
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
@@ -88,19 +135,47 @@ console.log(user);
         body: JSON.stringify({ email, password, fullName }),
       }
     );
-    localStorage.setItem('token', res.access_token);
-    setUser(res.user);
-    await loadProfile(res.user.id);
+    localStorage.setItem('access-token', res.access_token);
+    try {
+      const me = await getAuthMe();
+      setStateFromMe(me);
+      return me.activeBusinessId ?? null;
+    } catch (err: any) {
+      if (err instanceof ApiError && err.status === 403) {
+        const code = typeof err.data === 'object' && err.data && typeof (err.data as any).code === 'string' ? String((err.data as any).code) : '';
+        if (code === 'NOT_MEMBER') {
+          const payload = decodeJwt(res.access_token);
+          setUser(payload?.sub ? { id: payload.sub, email: payload.email, role: payload.role } : null);
+          setMe(null);
+          setActiveBusinessId(null);
+          setCapabilities([]);
+          return null;
+        }
+      }
+      throw err;
+    }
+  };
+
+  const provisionWorkspace = async () => {
+    const res = await apiFetch<{ success: boolean; activeBusinessId: string | null }>('/auth/provision-workspace', {
+      method: 'POST',
+    });
+    const me = await getAuthMe();
+    setStateFromMe(me);
+    return res.activeBusinessId ?? me.activeBusinessId ?? null;
   };
 
   const signOut = async () => {
     localStorage.removeItem('access-token');
+    localStorage.removeItem('active-business-id');
     setUser(null);
-    setProfile(null);
+    setMe(null);
+    setActiveBusinessId(null);
+    setCapabilities([]);
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, me, activeBusinessId, capabilities, loading, signIn, signUp, provisionWorkspace, signOut }}>
       {children}
     </AuthContext.Provider>
   );

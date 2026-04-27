@@ -2,14 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+:root,
+:host,
+.targetiq-root {
+  /* Font system variables */
+  --font-inter: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-ar: 'IBM Plex Arabic', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  /* TargetIQ brand tokens (mandatory) */
+  /* Required names (preferred) */
+  --tiq-primary-rgb: 255 106 0;
+  --tiq-secondary-rgb: 15 42 61;
+
+  --tiq-orange-rgb: 255 106 0;
+  --tiq-navy-rgb: 15 42 61;
+  --tiq-bg-rgb: 247 249 252;
+  --tiq-surface-rgb: 255 255 255;
+  --tiq-border-rgb: 230 234 240;
+  --tiq-text-rgb: 31 41 55;
+  --tiq-muted-rgb: 107 114 128;
+  --tiq-success-rgb: 22 163 74;
+  --tiq-warning-rgb: 245 158 11;
+  --tiq-danger-rgb: 239 68 68;
+  --tiq-info-rgb: 37 99 235;
+
+  /* Enhanced spacing system (8px base) */
+  --tiq-space-1: 4px;
+  --tiq-space-2: 8px;
+  --tiq-space-3: 12px;
+  --tiq-space-4: 16px;
+  --tiq-space-6: 24px;
+  --tiq-space-8: 32px;
+  --tiq-space-12: 48px;
+  --tiq-space-16: 64px;
+
+  /* Border radius system */
+  --tiq-radius-xs: 6px;
+  --tiq-radius-sm: 8px;
+  --tiq-radius-md: 12px;
+  --tiq-radius-lg: 16px;
+  --tiq-radius-xl: 20px;
+
+  /* Shadow system */
+  --tiq-shadow-xs: 0 1px 2px rgba(15,42,61,.04);
+  --tiq-shadow-sm: 0 2px 4px rgba(15,42,61,.06);
+  --tiq-shadow-md: 0 4px 12px rgba(15,42,61,.08);
+  --tiq-shadow-lg: 0 8px 24px rgba(15,42,61,.10);
+  --tiq-shadow-xl: 0 12px 32px rgba(15,42,61,.12);
+
+  --tiq-focus-ring: rgb(var(--tiq-primary-rgb) / 0.25);
+
+  /* Back-compat aliases used by existing tailwind/theme code */
+  --tiq-radius: var(--tiq-radius-md);
+  --tiq-shadow: var(--tiq-shadow-md);
+
+  --tiq-primary: #FF6A00;
+  --tiq-navy: #0F2A3D;
+  --tiq-bg: #F7F9FC;
+  --tiq-surface: #FFFFFF;
+  --tiq-border: #E6EAF0;
+  --tiq-text: #1F2937;
+  --tiq-muted: #6B7280;
+  --tiq-success: #16A34A;
+  --tiq-warning: #F59E0B;
+  --tiq-danger: #EF4444;
+  --tiq-info: #2563EB;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root,
+  :host,
+  .targetiq-root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
@@ -17,32 +83,33 @@
 }
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+  :root,
+  :host,
+  .targetiq-root {
+    /* Brand colors (TargetIQ) */
+    --color-primary: 24 100% 50%; /* #FF6B00 (H S% L%) */
+    --color-navy: 210 40% 17%; /* #1A2B3C */
+
+    /* UI tokens */
+    --background: 0 0% 97%; /* light grey background */
+    --foreground: 210 30% 8%; /* dark navy-ish text */
+    --card: 0 0% 100%; /* white cards */
+    --card-foreground: 210 30% 8%;
+
+    /* Primary (used for CTA) */
+    --primary: var(--color-primary);
+    --primary-foreground: 0 0% 100%;
+
+    /* Navy for headings / nav */
+    --navy: var(--color-navy);
+
+    --muted: 0 0% 94%;
+    --muted-foreground: 210 10% 40%;
+    --border: 210 16% 90%;
+    --input: 0 0% 100%;
+
+    --radius: 14px;
+    --card-shadow: 0 10px 30px rgba(26,43,60,0.06);
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -76,7 +143,277 @@
   * {
     @apply border-border;
   }
-  body {
+  body,
+  :host,
+  .targetiq-root {
     @apply bg-background text-foreground;
+    /* Default: Inter for LTR */
+    font-family: var(--font-inter);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Use Arabic font when page is RTL (Arabic locales) */
+  html[dir="rtl"], :host[dir="rtl"], .targetiq-root[dir="rtl"] {
+    font-family: var(--font-ar);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    line-height: 1.6;
+  }
+}
+
+@layer components {
+  .tiq-card {
+    border-radius: var(--tiq-radius-lg);
+    border: 1px solid rgb(var(--tiq-border-rgb) / 1);
+    background: rgb(var(--tiq-surface-rgb) / 1);
+    box-shadow: var(--tiq-shadow);
+  }
+
+  .tiq-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid rgb(var(--tiq-border-rgb) / 1);
+    padding: 16px 20px;
+  }
+
+  .tiq-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgb(var(--tiq-secondary-rgb) / 1);
+  }
+
+  .tiq-card-subtitle {
+    margin-top: 2px;
+    font-size: 14px;
+    color: rgb(var(--tiq-muted-rgb) / 1);
+  }
+
+  .tiq-card-body {
+    padding: 16px 20px;
+  }
+
+  .tiq-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 120ms ease, background 120ms ease, color 120ms ease,
+      border-color 120ms ease, box-shadow 120ms ease;
+  }
+
+  .tiq-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .tiq-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--tiq-shadow), 0 0 0 2px rgb(var(--tiq-bg-rgb) / 1),
+      0 0 0 5px var(--tiq-focus-ring);
+  }
+
+  .tiq-btn-md {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: var(--tiq-radius);
+    font-size: 14px;
+  }
+
+  .tiq-btn-sm {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: var(--tiq-radius);
+    font-size: 14px;
+  }
+
+  .tiq-btn-icon {
+    height: 44px;
+    width: 44px;
+    padding: 0;
+    border-radius: var(--tiq-radius);
+  }
+
+  .tiq-btn-primary {
+    background: rgb(var(--tiq-primary-rgb) / 1);
+    color: white;
+    border: 1px solid transparent;
+    box-shadow: var(--tiq-shadow);
+  }
+
+  .tiq-btn-primary:hover:not(:disabled) {
+    opacity: 0.95;
+  }
+
+  .tiq-btn-primary:active:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  @keyframes tiq-vibrate {
+    0% {
+      transform: translate(0);
+    }
+    20% {
+      transform: translate(-1px, 1px);
+    }
+    40% {
+      transform: translate(-1px, -1px);
+    }
+    60% {
+      transform: translate(1px, 1px);
+    }
+    80% {
+      transform: translate(1px, -1px);
+    }
+    100% {
+      transform: translate(0);
+    }
+  }
+
+  .animate-vibrate {
+    animation: tiq-vibrate 0.3s linear infinite;
+  }
+
+  .tiq-btn-secondary {
+    background: rgb(var(--tiq-secondary-rgb) / 1);
+    color: white;
+    border: 1px solid transparent;
+    box-shadow: var(--tiq-shadow);
+  }
+
+  .tiq-btn-secondary:hover:not(:disabled) {
+    opacity: 0.95;
+  }
+
+  .tiq-btn-secondary:active:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  .tiq-btn-danger {
+    background: rgb(var(--tiq-danger-rgb) / 1);
+    color: white;
+    border: 1px solid transparent;
+    box-shadow: var(--tiq-shadow);
+  }
+
+  .tiq-btn-danger:hover:not(:disabled) {
+    opacity: 0.95;
+  }
+
+  .tiq-btn-danger:active:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  .tiq-btn-outline {
+    background: rgb(var(--tiq-surface-rgb) / 1);
+    color: rgb(var(--tiq-secondary-rgb) / 1);
+    border: 1px solid rgb(var(--tiq-border-rgb) / 1);
+  }
+
+  .tiq-btn-outline:hover:not(:disabled) {
+    background: rgb(var(--tiq-primary-rgb) / 0.1);
+  }
+
+  .tiq-btn-ghost {
+    background: transparent;
+    color: rgb(var(--tiq-secondary-rgb) / 1);
+    border: 1px solid transparent;
+  }
+
+  .tiq-btn-ghost:hover:not(:disabled) {
+    background: rgb(var(--tiq-primary-rgb) / 0.1);
+  }
+
+  .tiq-input {
+    height: 40px;
+    width: 100%;
+    border-radius: var(--tiq-radius);
+    border: 1px solid rgb(var(--tiq-border-rgb) / 1);
+    background: rgb(var(--tiq-surface-rgb) / 1);
+    padding: 0 12px;
+    font-size: 14px;
+    color: rgb(var(--tiq-text-rgb) / 1);
+    transition: box-shadow 120ms ease, border-color 120ms ease;
+  }
+
+  .tiq-input::placeholder {
+    color: rgb(var(--tiq-muted-rgb) / 1);
+  }
+
+  .tiq-input:focus-visible {
+    outline: none;
+    border-color: rgb(var(--tiq-primary-rgb) / 0.6);
+    box-shadow: 0 0 0 2px rgb(var(--tiq-bg-rgb) / 1), 0 0 0 5px var(--tiq-focus-ring);
+  }
+
+  .tiq-input:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .tiq-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgb(var(--tiq-secondary-rgb) / 1);
+  }
+
+  .tiq-help {
+    font-size: 12px;
+    color: rgb(var(--tiq-muted-rgb) / 1);
+  }
+
+  .tiq-divider {
+    height: 1px;
+    width: 100%;
+    background: rgb(var(--tiq-border-rgb) / 1);
+  }
+
+  .tiq-skeleton {
+    border-radius: var(--tiq-radius);
+    background: rgb(var(--tiq-border-rgb) / 0.5);
+    animation: tiq-pulse 1.5s ease-in-out infinite;
+  }
+
+  .tiq-empty {
+    border-radius: var(--tiq-radius);
+    border: 1px dashed rgb(var(--tiq-border-rgb) / 1);
+    background: rgb(var(--tiq-surface-rgb) / 1);
+    padding: 32px 20px;
+    text-align: center;
+  }
+
+  .tiq-empty-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(var(--tiq-secondary-rgb) / 1);
+  }
+
+  .tiq-empty-body {
+    margin-top: 4px;
+    font-size: 14px;
+    color: rgb(var(--tiq-muted-rgb) / 1);
+  }
+}
+
+@keyframes tiq-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
   }
 }

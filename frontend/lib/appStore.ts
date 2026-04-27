@@ -1,9 +1,30 @@
 import { create } from 'zustand';
+import { useEffect } from 'react';
 import { fetchLeadById, updateLeadStatus } from '@/services/leadServices';
-import { toast } from '@/hooks/use-toast';
 import { EnrichmentTaskI, GetEnrichmentTasksStatusI, LeadI } from './types';
-import { fetchCredits, getEnrichmentTasksStatus } from '@/services/enrichServices';
+import { fetchCredits, getEnrichmentTasksByLeadIds } from '@/services/enrichServices';
+import { translate } from '@/lib/i18n';
+import { safeLog, sanitizeError, hashIdentifier } from '@/lib/safeLogging';
 
+/** Emit a store-level error via custom event so UI can toast without coupling Zustand to toast libs */
+function emitStoreError(key: string, message: string): void {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(
+    new CustomEvent('targetiq:store-error', { detail: { key, message } }),
+  );
+}
+
+/** React hook — subscribe to store errors and call handler(key, message) */
+export function useStoreErrors(handler: (key: string, message: string) => void): void {
+  useEffect(() => {
+    const listener = (e: Event) => {
+      const { key, message } = (e as CustomEvent<{ key: string; message: string }>).detail;
+      handler(key, message);
+    };
+    window.addEventListener('targetiq:store-error', listener);
+    return () => window.removeEventListener('targetiq:store-error', listener);
+  }, [handler]);
+}
 
 interface AppStoreState {
   isEnrichmentProgressVisible: boolean;
@@ -30,28 +51,39 @@ interface AppStoreState {
 export const useAppStore = create<AppStoreState>((set, get) => ({
   isEnrichmentProgressVisible: false,
   tasks: [],
-  globalTimer: 9,
+  globalTimer: 10,
   leads: [],
   _interval: null,
   enrichmentCredits: 0,
   isEnriching: false,
   isEnrichmentCompleted: false,
 
-  // Méthodes existantes inchangées
-  setLeads: (leads) => set({ 
-    leads: typeof leads === 'function' ? leads(get().leads) : leads 
-  }),
-  showEnrichmentProgress: () => set({ isEnrichmentProgressVisible: true }),
-  hideEnrichmentProgress: () => set({ isEnrichmentProgressVisible: false, globalTimer: 9 }),
-  
+  setLeads: (leads) => set({ leads: typeof leads === 'function' ? leads(get().leads) : leads }),
+  showEnrichmentProgress: () => set({ isEnrichmentProgressVisible: true, isEnrichmentCompleted: false }),
+  hideEnrichmentProgress: () => set({ isEnrichmentProgressVisible: false, globalTimer: 10 }),
+
   addTask: (task: EnrichmentTaskI) =>
-    set((state) => ({
-      tasks: [...state.tasks, task],
-    })),
+    set((state) => {
+      const existingIndex = state.tasks.findIndex((t) => t.leadId === task.leadId);
+      if (existingIndex === -1) {
+        return { tasks: [...state.tasks, task] };
+      }
+      const existing = state.tasks[existingIndex];
+      const next = [...state.tasks];
+      next[existingIndex] = {
+        ...existing,
+        ...task,
+        // Preserve creditsUsed from original — status updates don't include it
+        creditsUsed: task.creditsUsed ?? existing.creditsUsed,
+      };
+      return { tasks: next };
+    }),
 
   updateGlobalTimer: () => {
     const state = get();
     if (state._interval) clearInterval(state._interval);
+
+    set({ globalTimer: 10, isEnrichmentCompleted: false });
 
     const newInterval = setInterval(() => {
       const current = get();
@@ -60,12 +92,19 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
         return;
       }
 
-      if (current.globalTimer <= 0) {
-        current.fetchTaskStatus();
-        set({ globalTimer: 9 });
-      } else {
-        set({ globalTimer: current.globalTimer - 1 });
+      if (current.isEnrichmentCompleted) {
+        clearInterval(newInterval);
+        set({ _interval: null });
+        return;
       }
+
+      if (current.globalTimer <= 1) {
+        current.fetchTaskStatus();
+        set({ globalTimer: 10 });
+        return;
+      }
+
+      set({ globalTimer: current.globalTimer - 1 });
     }, 1000);
 
     set({ _interval: newInterval });
@@ -77,124 +116,94 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     set({ _interval: null });
   },
 
-  // fetchTaskStatus avec corrections minimales
   fetchTaskStatus: async () => {
     try {
-      const response = await getEnrichmentTasksStatus();
-      const updatedTasks: GetEnrichmentTasksStatusI[] = response?.data ?? [];
+      const stateNow = get();
+      const leadIds = (stateNow.tasks || []).map((t) => t.leadId).filter(Boolean);
 
-      if (updatedTasks.length === 0) {
+      if (leadIds.length === 0) {
         const { _interval } = get();
-        if (_interval) {
-          clearInterval(_interval);
-          set({ 
-            _interval: null,
-            isEnrichmentCompleted: true
-          });
-        }
+        if (_interval) clearInterval(_interval);
+        set({ _interval: null, isEnrichmentCompleted: true, globalTimer: 10 });
         return;
       }
 
+      const updatedTasks: GetEnrichmentTasksStatusI[] = await getEnrichmentTasksByLeadIds(leadIds);
+
       set((state) => {
-        // Mise à jour des tâches existantes
-        const updatedExistingTasks = state.tasks.map((task): EnrichmentTaskI => {
+        const currentTasks = (state.tasks || []).map((task): EnrichmentTaskI => {
           const currentTask = updatedTasks.find((s) => s.leadId === task.leadId);
           if (!currentTask) {
-            return {
-              ...task,
-              status: 'terminated',
-              message: 'Processus terminé',
-            };
+            return { ...task, status: 'terminated', message: translate('lead.enrichmentFinished') };
           }
+
           return {
             ...task,
-            status: currentTask.status,
-            message:
-              currentTask.status === 'pending'
-                ? "En cours d'enrichissement"
-                : currentTask.status === 'success'
-                ? `Email trouvé : ${currentTask.email}`
-                : 'Email non trouvé',
+            status: currentTask.status as any,
             email: currentTask.email,
+            phone: currentTask.phone,
+            requestedFields: currentTask.requestedFields,
+            message: currentTask.message || task.message,
           };
-        });
-
-        // Nouvelles tâches
-        const newTasks: EnrichmentTaskI[] = updatedTasks
-          .filter((s) => !state.tasks.some((t) => t.leadId === s.leadId))
-          .map((s) => ({
-            leadId: s.leadId,
-            name: '', // Ajout du champ name manquant
-            status: s.status,
-            message:
-              s.status === 'pending'
-                ? "En cours d'enrichissement"
-                : s.status === 'success'
-                ? `Email trouvé : ${s.email}`
-                : 'Email non trouvé',
-            email: s.email,
-          }));
-
-        const currentTasks = [...updatedExistingTasks, ...newTasks];
-
-        // Mise à jour des leads (inchangé)
-        updatedTasks.forEach(async (updatedTask) => {
-          if (updatedTask.status === 'success' || updatedTask.status === 'error') {
-            try {
-              let updatedLead = await fetchLeadById(updatedTask.leadId);
-              await updateLeadStatus(updatedTask.leadId, updatedTask.status);
-              updatedLead.status = updatedTask.status;
-              
-              set((state) => ({
-                leads: state.leads.map((lead) =>
-                  lead.id === updatedTask.leadId ? updatedLead : lead
-                ),
-              }));
-            } catch (error) {
-              console.error(`Erreur lors de la récupération du lead ${updatedTask.leadId}:`, error);
-            }
-          }
-        });
-
-        // Gestion des tâches terminées (inchangé)
-        currentTasks.forEach((task) => {
-          if (['success', 'failed', 'terminated'].includes(task.status)) {
-            setTimeout(() => {
-              set((state) => ({
-                tasks: state.tasks.filter((t) => t.leadId !== task.leadId),
-              }));
-            }, 9000);
-          }
-          if (['error', 'failed'].includes(task.status)) {
-            set((state) => ({
-              enrichmentCredits: state.enrichmentCredits + 1
-            }));
-          }
         });
 
         return { tasks: currentTasks };
       });
-    } catch (error) {
-      console.error('Error fetching task status:', error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de récupérer le statut des tâches"
+
+      updatedTasks.forEach(async (updatedTask) => {
+        if (updatedTask.status === 'success' || updatedTask.status === 'error') {
+          try {
+            const updatedLead = await fetchLeadById(updatedTask.leadId);
+            await updateLeadStatus(updatedTask.leadId, updatedTask.status);
+            (updatedLead as any).status = updatedTask.status;
+
+            set((state) => ({
+              leads: state.leads.map((lead) =>
+                lead.id === updatedTask.leadId ? (updatedLead as any) : lead,
+              ),
+            }));
+
+            // Refresh credits every time a task succeeds (credits were consumed)
+            if (updatedTask.status === 'success') {
+              await get().fetchEnrichmentCredits();
+            }
+          } catch (error) {
+            const se = sanitizeError(error);
+            safeLog('error', 'appstore.fetchLead.failed', {
+              leadIdHash: updatedTask?.leadId ? hashIdentifier(String(updatedTask.leadId), 'leadId') : undefined,
+              message: se.message,
+              code: se.code,
+            });
+          }
+        }
       });
+
+      const after = get();
+      const allDone = (after.tasks || []).length > 0 && (after.tasks || []).every((t) => t.status !== 'pending');
+      if (allDone) {
+        const { _interval } = after;
+        if (_interval) clearInterval(_interval);
+        set({ _interval: null, isEnrichmentCompleted: true, globalTimer: 10 });
+        await get().fetchEnrichmentCredits();
+      }
+    } catch (error) {
+      const se = sanitizeError(error);
+      safeLog('error', 'appstore.fetchTaskStatus.failed', { message: se.message, code: se.code });
+      emitStoreError('fetchTaskStatus', se.message || translate('lead.enrichmentTasksStatusFetchFailed'));
     }
   },
 
-  // Méthodes existantes inchangées
   setIsEnriching: (value) => set({ isEnriching: value }),
   setEnrichmentCompleted: (value) => set({ isEnrichmentCompleted: value }),
   setEnrichmentCredits: (newCredits) => set({ enrichmentCredits: newCredits }),
-  
+
   fetchEnrichmentCredits: async () => {
     try {
       const newCredits = await fetchCredits();
       set({ enrichmentCredits: newCredits });
     } catch (err) {
-      console.error('Erreur lors de la récupération de enrichCredits', err);
+      const se = sanitizeError(err);
+      safeLog('error', 'appstore.fetchCredits.failed', { message: se.message, code: se.code });
     }
   },
 }));
