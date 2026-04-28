@@ -148,8 +148,6 @@ export function PublicPricingSection({ compact = false }: { compact?: boolean })
           labels={labels}
           currentPlanCode={null}
           isLoggedIn={!!user}
-          selectedPlanCode={null}
-          compact={compact}
         />
       )}
     </div>

@@ -31,7 +31,7 @@ import { Plus, Search, Pencil, Trash2, Mail, Phone, Building, MoreHorizontal } f
 import { LeadI, ScrapingI } from '@/lib/types';
 import { useLeadsData } from '@/hooks/useLeadsData';
 import EnrichLeadButton from '@/components/dashboard/leads/EnrichLeadButton';
-import { ScrapingDataSelector } from '@/components/dashboard/leads/ScrapingDataSelector';
+import { CollectionDataSelector } from '@/components/dashboard/leads/ScrapingDataSelector';
 import { useAppStore } from '@/lib/appStore';
 import { Zap } from 'lucide-react';
 import EnrichmentProgress from '@/components/dashboard/leads/EnrichmentProgress';
@@ -304,8 +304,8 @@ export default function LeadsPage() {
         </div>
         {/* Enrichment progress bar, always visible at top of leads page */}
         <EnrichmentProgress />
-        <ScrapingDataSelector
-          scrapings={scrapings}
+        <CollectionDataSelector
+          collections={scrapings}
           selectedFile={selectedFile ?? null}
           setSelectedFile={(id) => {
             setSelectedFile(id);
@@ -323,7 +323,7 @@ export default function LeadsPage() {
               })();
             }
           }}
-          setSelectedScrape={setSelectedScrape}
+          setSelectedCollection={setSelectedScrape}
         />
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-[#1A2B3C]">{t('allLeads')}</h1>

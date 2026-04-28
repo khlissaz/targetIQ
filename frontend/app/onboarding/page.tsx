@@ -156,7 +156,7 @@ export default function OnboardingPage() {
   const { user, activeBusinessId, provisionWorkspace, loading: authLoading } = useAuth();
   const [creating, setCreating] = useState(false);
   const [summary, setSummary] = useState<{ hasAccount: boolean; hasWorkspace: boolean; planCode: string } | null>(null);
-  const selectedPlan = searchParams.get('plan');
+  const selectedPlan = searchParams?.get('plan');
 
   // Auth guard
   useEffect(() => {
